@@ -2,6 +2,8 @@
 
 An intelligent prompt editor for AI image, video and audio generators. Craft, optimize and manage prompts for Midjourney, Flux, Stable Diffusion, DALL-E, Kling, Runway, Suno and more — all from your browser.
 
+![Pix3lPrompt Screenshot](screenshot.jpg)
+
 ## Features
 
 - **Multi-model support** — Model-aware prompt assembly with correct syntax for each generator (Midjourney `--ar`, `--v`, `--no`; Flux/SD natural language; DALL-E; Suno/Udio audio)
@@ -36,7 +38,7 @@ An intelligent prompt editor for AI image, video and audio generators. Craft, op
 ### Installation
 
 ```bash
-git clone https://github.com/pix3ltools/pix3lprompt.git
+git clone https://github.com/Pix3ltools-lab/pix3lprompt.git
 cd pix3lprompt
 npm install
 ```
