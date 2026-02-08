@@ -24,8 +24,12 @@ export interface LightingPreset {
 export interface Template {
   id: number;
   name: string;
+  subject: string;
   preview: string;
-  style: string;
+  styles: string[];
+  lighting: string[];
+  aspectRatio: string;
+  details: string;
   category: "quick-start" | "favorites";
 }
 
@@ -131,49 +135,73 @@ export const templates: Template[] = [
   {
     id: 1,
     name: "Cinematic Portrait",
+    subject: "A portrait with shallow depth of field",
     preview:
       "A portrait with cinematic lighting, shallow depth of field, dramatic shadows",
-    style: "cinematic",
+    styles: ["cinematic"],
+    lighting: ["dramatic-shadows", "rim-light"],
+    aspectRatio: "3:2",
+    details: "sharp focus, film grain, bokeh background",
     category: "quick-start",
   },
   {
     id: 2,
     name: "Fantasy Landscape",
+    subject: "An epic fantasy landscape with mountains and waterfalls",
     preview:
       "An epic fantasy landscape with mountains, waterfalls, and magical atmosphere",
-    style: "concept-art",
+    styles: ["concept-art"],
+    lighting: ["volumetric", "golden-hour"],
+    aspectRatio: "16:9",
+    details: "highly detailed, epic scale, magical atmosphere",
     category: "quick-start",
   },
   {
     id: 3,
     name: "Product Shot",
+    subject: "Clean product photography on white background",
     preview:
       "Clean product photography on white background, studio lighting, sharp focus",
-    style: "photorealistic",
+    styles: ["photorealistic"],
+    lighting: ["studio-lighting"],
+    aspectRatio: "1:1",
+    details: "sharp focus, high resolution, commercial quality",
     category: "quick-start",
   },
   {
     id: 4,
     name: "Abstract Art",
+    subject: "Abstract composition with bold colors and geometric shapes",
     preview:
       "Abstract composition with bold colors, geometric shapes, modern art style",
-    style: "minimalist",
+    styles: ["minimalist"],
+    lighting: ["ethereal"],
+    aspectRatio: "1:1",
+    details: "modern art, bold palette, clean lines",
     category: "quick-start",
   },
   {
     id: 5,
     name: "Neon Cyberpunk City",
+    subject: "Cyberpunk cityscape with rain-slicked streets",
     preview:
       "Cyberpunk cityscape with neon lights, rain-slicked streets, futuristic architecture",
-    style: "cyberpunk",
+    styles: ["cyberpunk"],
+    lighting: ["neon-glow", "foggy"],
+    aspectRatio: "21:9",
+    details: "futuristic architecture, reflections, cinematic composition",
     category: "favorites",
   },
   {
     id: 6,
     name: "Watercolor Nature",
+    subject: "Delicate painting of flowers in a garden",
     preview:
       "Delicate watercolor painting of flowers in a garden, soft pastel colors",
-    style: "watercolor",
+    styles: ["watercolor"],
+    lighting: ["natural-light"],
+    aspectRatio: "4:5",
+    details: "soft pastel colors, delicate brushstrokes, paper texture",
     category: "favorites",
   },
 ];
