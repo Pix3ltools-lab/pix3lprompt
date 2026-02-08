@@ -17,7 +17,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pix3lPrompt",
+  title: "Pix3lPrompt — Intelligent Prompt Editor for AI Generators",
   description:
     "Intelligent prompt editor for AI image, video and audio generators",
 };
