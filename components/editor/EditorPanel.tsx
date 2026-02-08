@@ -4,11 +4,15 @@ import { useState, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Copy, Sparkles, Shuffle, Send, Check, RotateCcw, Save } from "lucide-react";
+import {
+  Copy, Sparkles, Shuffle, Send, Check, RotateCcw, Save, Settings, Loader2, X,
+} from "lucide-react";
 import { styleChips, lightingPresets } from "@/data/mock";
 import { useStore } from "@/lib/store";
 import { useHistory } from "@/hooks/useHistory";
+import { useAiProvider } from "@/hooks/useAiProvider";
 import { ModelSelector } from "@/components/editor/ModelSelector";
+import Link from "next/link";
 
 const aspectRatios = ["16:9", "3:2", "1:1", "9:16", "4:5", "21:9"];
 
@@ -32,8 +36,11 @@ export function EditorPanel() {
   const resetEditor = useStore((s) => s.resetEditor);
 
   const { savePrompt, updatePrompt } = useHistory();
+  const { optimize, generateVariations, isLoading: aiLoading, isLocal, error: aiError } = useAiProvider();
+
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [variations, setVariations] = useState<string[] | null>(null);
 
   const assembledPrompt = useMemo(() => {
     const parts: string[] = [];
@@ -95,6 +102,26 @@ export function EditorPanel() {
     }
     setSaved(true);
     setTimeout(() => setSaved(false), 1500);
+  }
+
+  const buildContext = () => ({
+    targetModel,
+    previousRatings: [],
+    preferredStyles: styles,
+    avoidKeywords: [],
+  });
+
+  async function handleOptimize() {
+    if (!assembledPrompt) return;
+    const result = await optimize(assembledPrompt, buildContext());
+    // Parse result back into the subject field (optimized prompt replaces subject)
+    setSubject(result);
+  }
+
+  async function handleVariations() {
+    if (!assembledPrompt) return;
+    const result = await generateVariations(assembledPrompt, 4, buildContext());
+    setVariations(result);
   }
 
   function renderPreview() {
@@ -166,11 +193,20 @@ export function EditorPanel() {
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-6">
-      {/* Model Selector */}
+      {/* Model Selector + Settings link */}
       <section>
-        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Target Model
-        </label>
+        <div className="mb-1.5 flex items-center justify-between">
+          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Target Model
+          </label>
+          <Link
+            href="/settings"
+            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+          >
+            <Settings className="h-3.5 w-3.5" />
+            {isLocal ? "AI: Local Rules" : "AI: Connected"}
+          </Link>
+        </div>
         <ModelSelector />
       </section>
 
@@ -332,12 +368,31 @@ export function EditorPanel() {
           )}
           {saved ? "Saved!" : "Save"}
         </Button>
-        <Button size="sm" className="gap-1.5">
-          <Sparkles className="h-3.5 w-3.5" />
+        <Button
+          size="sm"
+          className="gap-1.5"
+          onClick={handleOptimize}
+          disabled={aiLoading || !assembledPrompt}
+        >
+          {aiLoading ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Sparkles className="h-3.5 w-3.5" />
+          )}
           Optimize
         </Button>
-        <Button size="sm" variant="outline" className="gap-1.5">
-          <Shuffle className="h-3.5 w-3.5" />
+        <Button
+          size="sm"
+          variant="outline"
+          className="gap-1.5"
+          onClick={handleVariations}
+          disabled={aiLoading || !assembledPrompt}
+        >
+          {aiLoading ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Shuffle className="h-3.5 w-3.5" />
+          )}
           Variations
         </Button>
         <Button size="sm" variant="outline" className="gap-1.5">
@@ -354,6 +409,44 @@ export function EditorPanel() {
           Reset
         </Button>
       </section>
+
+      {/* AI Error */}
+      {aiError && (
+        <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
+          {aiError}
+        </div>
+      )}
+
+      {/* Variations panel */}
+      {variations && variations.length > 0 && (
+        <section>
+          <div className="mb-1.5 flex items-center justify-between">
+            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Variations
+            </label>
+            <button
+              onClick={() => setVariations(null)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+          <div className="flex flex-col gap-2">
+            {variations.map((v, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  setSubject(v);
+                  setVariations(null);
+                }}
+                className="rounded-lg border border-border bg-background p-3 text-left font-mono text-xs leading-relaxed transition-colors hover:bg-elevated"
+              >
+                {v}
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

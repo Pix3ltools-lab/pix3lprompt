@@ -747,7 +747,14 @@ interface BoardCardPayload {
    - `EditorPanel.tsx` migrato da useState a useStore()
    - `MobileLayout.tsx` + `MobileNav.tsx`: activePanel nello store condiviso (tipo `ActivePanel`)
    - Bottone Reset nell'action bar
-4. **Implementa IndexedDB** con Dexie per salvataggio e history
+4. ~~**Implementa IndexedDB** con Dexie per salvataggio e history~~ ✅ **DONE**
+   - `types/index.ts`: tipi condivisi (`SavedPrompt`, `UserPreference`, `AiProviderConfig`)
+   - `lib/db.ts`: Dexie DB con tabelle `prompts`, `preferences`, `aiConfig`
+   - `hooks/useHistory.ts`: CRUD hook con `useLiveQuery` per aggiornamenti reattivi
+   - Save button in ActionBar: persiste il prompt corrente in IndexedDB (create/update)
+   - HistoryPanel: mostra prompt reali da IndexedDB (non più mock), empty state
+   - HistoryCard: click carica nell'editor, evidenzia attivo, delete con icona on hover
+   - `loadPrompt` + `editingPromptId` aggiunti allo store Zustand
 5. **Aggiungi il sistema AI provider** partendo da `LocalRulesProvider`, poi `OpenRouterProvider`
 6. **Implementa Optimize e Variations** con fallback locale
 7. **Aggiungi MoodPreview** CSS/SVG
