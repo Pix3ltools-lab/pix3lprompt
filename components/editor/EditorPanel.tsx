@@ -4,9 +4,10 @@ import { useState, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Copy, Sparkles, Shuffle, Send, Check, RotateCcw } from "lucide-react";
+import { Copy, Sparkles, Shuffle, Send, Check, RotateCcw, Save } from "lucide-react";
 import { styleChips, lightingPresets } from "@/data/mock";
 import { useStore } from "@/lib/store";
+import { useHistory } from "@/hooks/useHistory";
 import { ModelSelector } from "@/components/editor/ModelSelector";
 
 const aspectRatios = ["16:9", "3:2", "1:1", "9:16", "4:5", "21:9"];
@@ -24,9 +25,15 @@ export function EditorPanel() {
   const setDetails = useStore((s) => s.setDetails);
   const negativePrompt = useStore((s) => s.negativePrompt);
   const setNegativePrompt = useStore((s) => s.setNegativePrompt);
+  const cameraAngle = useStore((s) => s.cameraAngle);
+  const parameters = useStore((s) => s.parameters);
+  const targetModel = useStore((s) => s.targetModel);
+  const editingPromptId = useStore((s) => s.editingPromptId);
   const resetEditor = useStore((s) => s.resetEditor);
 
+  const { savePrompt, updatePrompt } = useHistory();
   const [copied, setCopied] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   const assembledPrompt = useMemo(() => {
     const parts: string[] = [];
@@ -62,6 +69,32 @@ export function EditorPanel() {
     await navigator.clipboard.writeText(assembledPrompt);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
+  }
+
+  async function handleSave() {
+    const data = {
+      subject,
+      styles,
+      lighting,
+      composition: { aspectRatio, cameraAngle },
+      details,
+      negativePrompt,
+      parameters,
+      targetModel,
+      assembledPrompt,
+      rating: null,
+      notes: "",
+      tags: [],
+      isFavorite: false,
+    };
+
+    if (editingPromptId) {
+      await updatePrompt(editingPromptId, data);
+    } else {
+      await savePrompt(data);
+    }
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1500);
   }
 
   function renderPreview() {
@@ -285,6 +318,19 @@ export function EditorPanel() {
             <Copy className="h-3.5 w-3.5" />
           )}
           {copied ? "Copied!" : "Copy"}
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="gap-1.5"
+          onClick={handleSave}
+        >
+          {saved ? (
+            <Check className="h-3.5 w-3.5" />
+          ) : (
+            <Save className="h-3.5 w-3.5" />
+          )}
+          {saved ? "Saved!" : "Save"}
         </Button>
         <Button size="sm" className="gap-1.5">
           <Sparkles className="h-3.5 w-3.5" />

@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import type { SavedPrompt } from "@/types";
 
 export type ActivePanel = "history" | "editor" | "templates";
 
@@ -17,6 +18,7 @@ interface EditorState {
   targetModel: string;
 
   // UI state
+  editingPromptId: number | null;
   activePanel: ActivePanel;
   isParametersPanelOpen: boolean;
   isOptimizing: boolean;
@@ -46,6 +48,7 @@ interface EditorActions {
   setGeneratingVariations: (value: boolean) => void;
 
   // Bulk actions
+  loadPrompt: (prompt: SavedPrompt) => void;
   resetEditor: () => void;
 }
 
@@ -62,6 +65,7 @@ const initialEditorState: EditorState = {
   parameters: {},
   targetModel: "midjourney-v7",
 
+  editingPromptId: null,
   activePanel: "editor",
   isParametersPanelOpen: false,
   isOptimizing: false,
@@ -96,6 +100,21 @@ export const useStore = create<EditorState & EditorActions>()((set) => ({
   setParametersPanelOpen: (open) => set({ isParametersPanelOpen: open }),
   setOptimizing: (value) => set({ isOptimizing: value }),
   setGeneratingVariations: (value) => set({ isGeneratingVariations: value }),
+
+  loadPrompt: (prompt) =>
+    set({
+      editingPromptId: prompt.id ?? null,
+      subject: prompt.subject,
+      styles: prompt.styles,
+      lighting: prompt.lighting,
+      aspectRatio: prompt.composition.aspectRatio,
+      cameraAngle: prompt.composition.cameraAngle,
+      details: prompt.details,
+      negativePrompt: prompt.negativePrompt,
+      parameters: prompt.parameters,
+      targetModel: prompt.targetModel,
+      activePanel: "editor",
+    }),
 
   resetEditor: () => set(initialEditorState),
 }));

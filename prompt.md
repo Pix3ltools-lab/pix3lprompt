@@ -734,14 +734,19 @@ interface BoardCardPayload {
    - Dark mode default via next-themes + `@custom-variant dark`
    - Fonts: Inter (UI) + JetBrains Mono (preview)
    - Mock data: 5 prompts, 20 style chips, 14 lighting presets, 6 templates
-2. ~~**Implementa l'editor** sezione per sezione~~ ✅ **DONE** (senza Zustand — useState locale, migrazione a Zustand prevista)
+2. ~~**Implementa l'editor** sezione per sezione~~ ✅ **DONE**
    - Subject, Details, Negative Prompt: `<textarea>` editabili
    - Style chips e Lighting chips: toggle multi-selezione
    - Composition: aspect ratio con selezione singola
    - Live Preview: assemblaggio in tempo reale con syntax highlighting per sezione (Subject=blue, Style=green, Lighting=yellow, Composition=purple, Details=slate, Negative=red)
    - Action Bar: Copy con feedback "Copied!", Optimize/Variations/Send to Board (placeholder)
    - Conteggio caratteri e stima token live
-3. **Migra stato editor a Zustand store** e aggiungi ModelSelector
+3. ~~**Migra stato editor a Zustand store** e aggiungi ModelSelector~~ ✅ **DONE**
+   - `lib/store.ts`: Zustand store con campi editor, UI state, actions tipizzate
+   - `ModelSelector.tsx`: Select con gruppi Image (9 modelli), Video (4), Audio (2)
+   - `EditorPanel.tsx` migrato da useState a useStore()
+   - `MobileLayout.tsx` + `MobileNav.tsx`: activePanel nello store condiviso (tipo `ActivePanel`)
+   - Bottone Reset nell'action bar
 4. **Implementa IndexedDB** con Dexie per salvataggio e history
 5. **Aggiungi il sistema AI provider** partendo da `LocalRulesProvider`, poi `OpenRouterProvider`
 6. **Implementa Optimize e Variations** con fallback locale
