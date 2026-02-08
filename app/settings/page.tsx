@@ -151,7 +151,7 @@ export default function SettingsPage() {
   const models = suggestedModels[provider];
 
   return (
-    <div className="mx-auto min-h-dvh max-w-2xl p-6">
+    <div className="mx-auto max-w-2xl flex-1 overflow-y-auto p-6">
       <div className="mb-6">
         <Link
           href="/editor"

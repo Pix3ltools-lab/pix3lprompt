@@ -5,12 +5,12 @@ export default function EditorPage() {
   return (
     <>
       {/* Desktop: 3-column layout (>= xl / 1280px) */}
-      <div className="hidden xl:block">
+      <div className="hidden min-h-0 flex-1 xl:flex">
         <DesktopLayout />
       </div>
 
       {/* Mobile/Tablet: tab-based layout (< 1280px) */}
-      <div className="xl:hidden">
+      <div className="flex min-h-0 flex-1 flex-col xl:hidden">
         <MobileLayout />
       </div>
     </>

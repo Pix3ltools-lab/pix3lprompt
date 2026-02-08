@@ -4,7 +4,7 @@ import { TemplatesPanel } from "@/components/templates/TemplatesPanel";
 
 export function DesktopLayout() {
   return (
-    <div className="flex h-dvh">
+    <div className="flex flex-1">
       <HistoryPanel />
       <main className="flex flex-1 flex-col overflow-y-auto">
         <EditorPanel />

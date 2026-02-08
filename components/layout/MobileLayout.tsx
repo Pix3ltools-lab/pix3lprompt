@@ -11,7 +11,7 @@ export function MobileLayout() {
   const setActivePanel = useStore((s) => s.setActivePanel);
 
   return (
-    <div className="flex h-dvh flex-col">
+    <div className="flex flex-1 flex-col">
       <div className="flex-1 overflow-y-auto">
         {activePanel === "history" && <HistoryPanel mobile />}
         {activePanel === "editor" && <EditorPanel />}
