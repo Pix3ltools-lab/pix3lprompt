@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { StorageWarning } from "@/components/layout/StorageWarning";
 import "./globals.css";
 
 const inter = Inter({
@@ -33,6 +34,7 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <Header />
+          <StorageWarning />
           <div className="flex min-h-0 flex-1 flex-col">{children}</div>
           <Footer />
         </ThemeProvider>
