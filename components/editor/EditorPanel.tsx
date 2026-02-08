@@ -8,6 +8,7 @@ import {
   Copy, Sparkles, Shuffle, Send, Check, RotateCcw, Save, Settings, Loader2, X,
 } from "lucide-react";
 import { styleChips, lightingPresets } from "@/data/mock";
+import { getModelConfig } from "@/data/models";
 import { useStore } from "@/lib/store";
 import { useHistory } from "@/hooks/useHistory";
 import { useAiProvider } from "@/hooks/useAiProvider";
@@ -42,6 +43,8 @@ export function EditorPanel() {
   const [saved, setSaved] = useState(false);
   const [variations, setVariations] = useState<string[] | null>(null);
 
+  const modelConfig = useMemo(() => getModelConfig(targetModel), [targetModel]);
+
   const assembledPrompt = useMemo(() => {
     const parts: string[] = [];
     if (subject.trim()) parts.push(subject.trim());
@@ -59,14 +62,22 @@ export function EditorPanel() {
           .join(", ")
       );
     }
-    parts.push(aspectRatio);
     if (details.trim()) parts.push(details.trim());
-    const prompt = parts.join(", ");
-    if (negativePrompt.trim()) {
-      return `${prompt} --no ${negativePrompt.trim()}`;
-    }
+    let prompt = parts.join(", ");
+
+    // Model-specific aspect ratio
+    const arStr = modelConfig.arFormat(aspectRatio);
+    if (arStr) prompt += ` ${arStr}`;
+
+    // Model-specific suffix (e.g. --v 6.1)
+    if (modelConfig.suffix) prompt += ` ${modelConfig.suffix}`;
+
+    // Model-specific negative prompt
+    const negStr = modelConfig.negFormat(negativePrompt.trim());
+    if (negStr) prompt += ` ${negStr}`;
+
     return prompt;
-  }, [subject, styles, lighting, aspectRatio, details, negativePrompt]);
+  }, [subject, styles, lighting, aspectRatio, details, negativePrompt, targetModel, modelConfig]);
 
   const charCount = assembledPrompt.length;
   const tokenEstimate = Math.max(1, Math.round(charCount / 4));
@@ -173,19 +184,22 @@ export function EditorPanel() {
         "text-yellow-400"
       );
     }
-    addSegment(aspectRatio, "text-purple-400");
     if (details.trim()) addSegment(details.trim(), "text-slate-300");
-    if (negativePrompt.trim()) {
-      segments.push(
-        <span key="neg-sep" className="text-foreground">
-          {" "}
-        </span>
-      );
-      segments.push(
-        <span key="neg" className="text-red-400/60">
-          --no {negativePrompt.trim()}
-        </span>
-      );
+
+    // Model-specific params (AR, suffix, negative) shown in orange/red
+    const arStr = modelConfig.arFormat(aspectRatio);
+    if (arStr) {
+      segments.push(<span key="ar-sp" className="text-foreground"> </span>);
+      segments.push(<span key="ar" className="text-purple-400">{arStr}</span>);
+    }
+    if (modelConfig.suffix) {
+      segments.push(<span key="suf-sp" className="text-foreground"> </span>);
+      segments.push(<span key="suf" className="text-orange-400">{modelConfig.suffix}</span>);
+    }
+    const negStr = modelConfig.negFormat(negativePrompt.trim());
+    if (negStr) {
+      segments.push(<span key="neg-sp" className="text-foreground"> </span>);
+      segments.push(<span key="neg" className="text-red-400/60">{negStr}</span>);
     }
 
     return segments;
@@ -222,7 +236,7 @@ export function EditorPanel() {
           id="subject"
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
-          placeholder="Describe what you want to generate..."
+          placeholder={modelConfig.placeholder}
           rows={3}
           className="w-full resize-none rounded-lg border border-input bg-background p-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
         />
