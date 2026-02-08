@@ -2,15 +2,14 @@
 
 import { Clock, PenLine, Lightbulb } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-export type MobileTab = "history" | "editor" | "templates";
+import type { ActivePanel } from "@/lib/store";
 
 interface MobileNavProps {
-  activeTab: MobileTab;
-  onTabChange: (tab: MobileTab) => void;
+  activeTab: ActivePanel;
+  onTabChange: (tab: ActivePanel) => void;
 }
 
-const tabs: { id: MobileTab; label: string; icon: React.ElementType }[] = [
+const tabs: { id: ActivePanel; label: string; icon: React.ElementType }[] = [
   { id: "history", label: "History", icon: Clock },
   { id: "editor", label: "Editor", icon: PenLine },
   { id: "templates", label: "Templates", icon: Lightbulb },

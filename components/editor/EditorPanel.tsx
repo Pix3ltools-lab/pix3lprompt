@@ -1,24 +1,162 @@
 "use client";
 
+import { useState, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Copy, Sparkles, Shuffle, Send } from "lucide-react";
+import { Copy, Sparkles, Shuffle, Send, Check, RotateCcw } from "lucide-react";
 import { styleChips, lightingPresets } from "@/data/mock";
+import { useStore } from "@/lib/store";
+import { ModelSelector } from "@/components/editor/ModelSelector";
+
+const aspectRatios = ["16:9", "3:2", "1:1", "9:16", "4:5", "21:9"];
 
 export function EditorPanel() {
+  const subject = useStore((s) => s.subject);
+  const setSubject = useStore((s) => s.setSubject);
+  const styles = useStore((s) => s.styles);
+  const toggleStyle = useStore((s) => s.toggleStyle);
+  const lighting = useStore((s) => s.lighting);
+  const toggleLighting = useStore((s) => s.toggleLighting);
+  const aspectRatio = useStore((s) => s.aspectRatio);
+  const setAspectRatio = useStore((s) => s.setAspectRatio);
+  const details = useStore((s) => s.details);
+  const setDetails = useStore((s) => s.setDetails);
+  const negativePrompt = useStore((s) => s.negativePrompt);
+  const setNegativePrompt = useStore((s) => s.setNegativePrompt);
+  const resetEditor = useStore((s) => s.resetEditor);
+
+  const [copied, setCopied] = useState(false);
+
+  const assembledPrompt = useMemo(() => {
+    const parts: string[] = [];
+    if (subject.trim()) parts.push(subject.trim());
+    if (styles.length > 0) {
+      parts.push(
+        styles
+          .map((id) => styleChips.find((c) => c.id === id)?.label ?? id)
+          .join(", ")
+      );
+    }
+    if (lighting.length > 0) {
+      parts.push(
+        lighting
+          .map((id) => lightingPresets.find((p) => p.id === id)?.label ?? id)
+          .join(", ")
+      );
+    }
+    parts.push(aspectRatio);
+    if (details.trim()) parts.push(details.trim());
+    const prompt = parts.join(", ");
+    if (negativePrompt.trim()) {
+      return `${prompt} --no ${negativePrompt.trim()}`;
+    }
+    return prompt;
+  }, [subject, styles, lighting, aspectRatio, details, negativePrompt]);
+
+  const charCount = assembledPrompt.length;
+  const tokenEstimate = Math.max(1, Math.round(charCount / 4));
+
+  async function handleCopy() {
+    if (!assembledPrompt) return;
+    await navigator.clipboard.writeText(assembledPrompt);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
+
+  function renderPreview() {
+    if (
+      !subject.trim() &&
+      styles.length === 0 &&
+      lighting.length === 0 &&
+      !details.trim()
+    ) {
+      return (
+        <span className="text-muted-foreground">
+          Your prompt will appear here...
+        </span>
+      );
+    }
+
+    const segments: React.ReactNode[] = [];
+    let needsComma = false;
+
+    function addSegment(text: string, color: string) {
+      if (needsComma)
+        segments.push(
+          <span key={`sep-${segments.length}`} className="text-foreground">
+            ,{" "}
+          </span>
+        );
+      segments.push(
+        <span key={`seg-${segments.length}`} className={color}>
+          {text}
+        </span>
+      );
+      needsComma = true;
+    }
+
+    if (subject.trim()) addSegment(subject.trim(), "text-blue-400");
+    if (styles.length > 0) {
+      addSegment(
+        styles
+          .map((id) => styleChips.find((c) => c.id === id)?.label ?? id)
+          .join(", "),
+        "text-green-400"
+      );
+    }
+    if (lighting.length > 0) {
+      addSegment(
+        lighting
+          .map((id) => lightingPresets.find((p) => p.id === id)?.label ?? id)
+          .join(", "),
+        "text-yellow-400"
+      );
+    }
+    addSegment(aspectRatio, "text-purple-400");
+    if (details.trim()) addSegment(details.trim(), "text-slate-300");
+    if (negativePrompt.trim()) {
+      segments.push(
+        <span key="neg-sep" className="text-foreground">
+          {" "}
+        </span>
+      );
+      segments.push(
+        <span key="neg" className="text-red-400/60">
+          --no {negativePrompt.trim()}
+        </span>
+      );
+    }
+
+    return segments;
+  }
+
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-6">
-      {/* Subject */}
+      {/* Model Selector */}
       <section>
         <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          Target Model
+        </label>
+        <ModelSelector />
+      </section>
+
+      {/* Subject */}
+      <section>
+        <label
+          htmlFor="subject"
+          className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+        >
           Subject
         </label>
-        <div className="min-h-[80px] rounded-lg border border-input bg-background p-3 text-sm text-foreground">
-          <span className="text-muted-foreground">
-            Describe what you want to generate...
-          </span>
-        </div>
+        <textarea
+          id="subject"
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+          placeholder="Describe what you want to generate..."
+          rows={3}
+          className="w-full resize-none rounded-lg border border-input bg-background p-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
+        />
       </section>
 
       {/* Style Chips */}
@@ -27,11 +165,12 @@ export function EditorPanel() {
           Style
         </label>
         <div className="flex flex-wrap gap-1.5">
-          {styleChips.map((chip, i) => (
+          {styleChips.map((chip) => (
             <Badge
               key={chip.id}
-              variant={i === 4 || i === 0 ? "default" : "outline"}
+              variant={styles.includes(chip.id) ? "default" : "outline"}
               className="cursor-pointer select-none transition-colors"
+              onClick={() => toggleStyle(chip.id)}
             >
               {chip.label}
             </Badge>
@@ -45,11 +184,12 @@ export function EditorPanel() {
           Lighting
         </label>
         <div className="flex flex-wrap gap-1.5">
-          {lightingPresets.map((preset, i) => (
+          {lightingPresets.map((preset) => (
             <Badge
               key={preset.id}
-              variant={i === 0 ? "default" : "outline"}
+              variant={lighting.includes(preset.id) ? "default" : "outline"}
               className="cursor-pointer select-none transition-colors"
+              onClick={() => toggleLighting(preset.id)}
             >
               {preset.label}
             </Badge>
@@ -63,11 +203,12 @@ export function EditorPanel() {
           Composition
         </label>
         <div className="flex flex-wrap gap-2">
-          {["16:9", "3:2", "1:1", "9:16", "4:5", "21:9"].map((ratio, i) => (
+          {aspectRatios.map((ratio) => (
             <button
               key={ratio}
+              onClick={() => setAspectRatio(ratio)}
               className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${
-                i === 0
+                aspectRatio === ratio
                   ? "border-primary bg-primary/10 text-primary"
                   : "border-border text-muted-foreground hover:text-foreground"
               }`}
@@ -80,26 +221,38 @@ export function EditorPanel() {
 
       {/* Details */}
       <section>
-        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <label
+          htmlFor="details"
+          className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+        >
           Details
         </label>
-        <div className="min-h-[60px] rounded-lg border border-input bg-background p-3 text-sm">
-          <span className="text-muted-foreground">
-            Additional details, quality modifiers...
-          </span>
-        </div>
+        <textarea
+          id="details"
+          value={details}
+          onChange={(e) => setDetails(e.target.value)}
+          placeholder="Additional details, quality modifiers..."
+          rows={2}
+          className="w-full resize-none rounded-lg border border-input bg-background p-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
+        />
       </section>
 
       {/* Negative Prompt */}
       <section>
-        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <label
+          htmlFor="negative"
+          className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+        >
           Negative Prompt
         </label>
-        <div className="min-h-[40px] rounded-lg border border-input bg-background p-3 text-sm">
-          <span className="text-muted-foreground">
-            blurry, deformed, watermark...
-          </span>
-        </div>
+        <textarea
+          id="negative"
+          value={negativePrompt}
+          onChange={(e) => setNegativePrompt(e.target.value)}
+          placeholder="blurry, deformed, watermark..."
+          rows={2}
+          className="w-full resize-none rounded-lg border border-input bg-background p-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
+        />
       </section>
 
       <Separator />
@@ -110,33 +263,28 @@ export function EditorPanel() {
           Live Preview
         </label>
         <div className="rounded-lg border border-border bg-background p-4 font-mono text-sm leading-relaxed">
-          <span className="text-blue-400">
-            A futuristic cityscape at sunset
-          </span>
-          <span className="text-foreground">, </span>
-          <span className="text-green-400">cinematic, photorealistic</span>
-          <span className="text-foreground">, </span>
-          <span className="text-yellow-400">golden hour lighting</span>
-          <span className="text-foreground">, </span>
-          <span className="text-purple-400">wide shot, 16:9</span>
-          <span className="text-foreground">, </span>
-          <span className="text-slate-300">highly detailed, 8k</span>
-          <span className="text-foreground"> </span>
-          <span className="text-orange-400">--v 6.1 --stylize 750</span>
-          <span className="text-foreground"> </span>
-          <span className="text-red-400/60">--no blurry, watermark</span>
+          {renderPreview()}
         </div>
         <div className="mt-1.5 flex items-center justify-between text-[10px] text-muted-foreground">
-          <span>142 characters</span>
-          <span>~32 tokens</span>
+          <span>{charCount} characters</span>
+          <span>~{tokenEstimate} tokens</span>
         </div>
       </section>
 
       {/* Action Bar */}
       <section className="flex flex-wrap gap-2">
-        <Button size="sm" variant="outline" className="gap-1.5">
-          <Copy className="h-3.5 w-3.5" />
-          Copy
+        <Button
+          size="sm"
+          variant="outline"
+          className="gap-1.5"
+          onClick={handleCopy}
+        >
+          {copied ? (
+            <Check className="h-3.5 w-3.5" />
+          ) : (
+            <Copy className="h-3.5 w-3.5" />
+          )}
+          {copied ? "Copied!" : "Copy"}
         </Button>
         <Button size="sm" className="gap-1.5">
           <Sparkles className="h-3.5 w-3.5" />
@@ -149,6 +297,15 @@ export function EditorPanel() {
         <Button size="sm" variant="outline" className="gap-1.5">
           <Send className="h-3.5 w-3.5" />
           Send to Board
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="ml-auto gap-1.5 text-muted-foreground"
+          onClick={resetEditor}
+        >
+          <RotateCcw className="h-3.5 w-3.5" />
+          Reset
         </Button>
       </section>
     </div>

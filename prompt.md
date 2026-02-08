@@ -726,9 +726,22 @@ interface BoardCardPayload {
 
 ## 15. Requisiti di Implementazione
 
-1. **Inizia dal layout responsive** (3 colonne desktop / tab mobile) con dati mock
-2. **Implementa l'editor** sezione per sezione con il Zustand store
-3. **Aggiungi PromptPreview** con assemblaggio e syntax highlighting
+1. ~~**Inizia dal layout responsive** (3 colonne desktop / tab mobile) con dati mock~~ ✅ **DONE**
+   - Next.js 15 + Tailwind CSS 4 + shadcn/ui scaffolded
+   - 3-column desktop layout (History 280px | Editor flex | Templates 280px)
+   - Mobile bottom tab navigation with useState switching
+   - CSS visibility toggle (`hidden xl:block` / `xl:hidden`) — no hydration mismatch
+   - Dark mode default via next-themes + `@custom-variant dark`
+   - Fonts: Inter (UI) + JetBrains Mono (preview)
+   - Mock data: 5 prompts, 20 style chips, 14 lighting presets, 6 templates
+2. ~~**Implementa l'editor** sezione per sezione~~ ✅ **DONE** (senza Zustand — useState locale, migrazione a Zustand prevista)
+   - Subject, Details, Negative Prompt: `<textarea>` editabili
+   - Style chips e Lighting chips: toggle multi-selezione
+   - Composition: aspect ratio con selezione singola
+   - Live Preview: assemblaggio in tempo reale con syntax highlighting per sezione (Subject=blue, Style=green, Lighting=yellow, Composition=purple, Details=slate, Negative=red)
+   - Action Bar: Copy con feedback "Copied!", Optimize/Variations/Send to Board (placeholder)
+   - Conteggio caratteri e stima token live
+3. **Migra stato editor a Zustand store** e aggiungi ModelSelector
 4. **Implementa IndexedDB** con Dexie per salvataggio e history
 5. **Aggiungi il sistema AI provider** partendo da `LocalRulesProvider`, poi `OpenRouterProvider`
 6. **Implementa Optimize e Variations** con fallback locale
