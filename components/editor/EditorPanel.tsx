@@ -36,6 +36,9 @@ export function EditorPanel() {
   const editingPromptId = useStore((s) => s.editingPromptId);
   const resetEditor = useStore((s) => s.resetEditor);
 
+  const setStyles = useStore((s) => s.setStyles);
+  const setLighting = useStore((s) => s.setLighting);
+
   const { savePrompt, updatePrompt } = useHistory();
   const { optimize, generateVariations, isLoading: aiLoading, isLocal, error: aiError } = useAiProvider();
 
@@ -115,6 +118,28 @@ export function EditorPanel() {
     setTimeout(() => setSaved(false), 1500);
   }
 
+  // Content-only prompt for AI optimization (no model-specific params like --ar, --v, --no)
+  const contentPrompt = useMemo(() => {
+    const parts: string[] = [];
+    if (subject.trim()) parts.push(subject.trim());
+    if (styles.length > 0) {
+      parts.push(
+        styles
+          .map((id) => styleChips.find((c) => c.id === id)?.label ?? id)
+          .join(", ")
+      );
+    }
+    if (lighting.length > 0) {
+      parts.push(
+        lighting
+          .map((id) => lightingPresets.find((p) => p.id === id)?.label ?? id)
+          .join(", ")
+      );
+    }
+    if (details.trim()) parts.push(details.trim());
+    return parts.join(", ");
+  }, [subject, styles, lighting, details]);
+
   const buildContext = () => ({
     targetModel,
     previousRatings: [],
@@ -123,15 +148,18 @@ export function EditorPanel() {
   });
 
   async function handleOptimize() {
-    if (!assembledPrompt) return;
-    const result = await optimize(assembledPrompt, buildContext());
-    // Parse result back into the subject field (optimized prompt replaces subject)
+    if (!contentPrompt) return;
+    const result = await optimize(contentPrompt, buildContext());
+    // Put result in subject; clear styles/lighting/details since they are now merged in
     setSubject(result);
+    setStyles([]);
+    setLighting([]);
+    setDetails("");
   }
 
   async function handleVariations() {
-    if (!assembledPrompt) return;
-    const result = await generateVariations(assembledPrompt, 4, buildContext());
+    if (!contentPrompt) return;
+    const result = await generateVariations(contentPrompt, 4, buildContext());
     setVariations(result);
   }
 
@@ -451,6 +479,9 @@ export function EditorPanel() {
                 key={i}
                 onClick={() => {
                   setSubject(v);
+                  setStyles([]);
+                  setLighting([]);
+                  setDetails("");
                   setVariations(null);
                 }}
                 className="rounded-lg border border-border bg-background p-3 text-left font-mono text-xs leading-relaxed transition-colors hover:bg-elevated"

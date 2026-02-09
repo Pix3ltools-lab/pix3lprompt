@@ -37,6 +37,10 @@ interface EditorActions {
   setTargetModel: (value: string) => void;
   setParameter: (key: string, value: string | number) => void;
 
+  // Bulk setters
+  setStyles: (styles: string[]) => void;
+  setLighting: (lighting: string[]) => void;
+
   // Toggle actions
   toggleStyle: (id: string) => void;
   toggleLighting: (id: string) => void;
@@ -91,6 +95,9 @@ export const useStore = create<EditorState & EditorActions>()((set) => ({
     set((state) => ({
       parameters: { ...state.parameters, [key]: value },
     })),
+
+  setStyles: (styles) => set({ styles }),
+  setLighting: (lighting) => set({ lighting }),
 
   toggleStyle: (id) => set((state) => ({ styles: toggleItem(state.styles, id) })),
   toggleLighting: (id) =>

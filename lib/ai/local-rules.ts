@@ -81,12 +81,6 @@ export class LocalRulesProvider implements AiProvider {
 
     let result = parts.join(", ");
 
-    // Add negative prompt hint if missing
-    if (!result.includes("--no")) {
-      const neg = getNegativeForModel(context.targetModel);
-      result += ` --no ${neg}`;
-    }
-
     // Clean up double spaces and commas
     result = result.replace(/\s{2,}/g, " ").replace(/,\s*,/g, ",");
 
@@ -98,14 +92,10 @@ export class LocalRulesProvider implements AiProvider {
     count: number,
     context: PromptContext
   ): Promise<string[]> {
-    const baseParts = prompt
+    const keywords = prompt
       .split(",")
       .map((p) => p.trim())
       .filter(Boolean);
-    const paramIndex = baseParts.findIndex((p) => p.startsWith("--"));
-    const keywords = paramIndex >= 0 ? baseParts.slice(0, paramIndex) : baseParts;
-    const params = paramIndex >= 0 ? baseParts.slice(paramIndex) : [];
-    const paramsStr = params.length > 0 ? " " + params.join(" ") : "";
 
     const variations: string[] = [];
 
@@ -116,25 +106,25 @@ export class LocalRulesProvider implements AiProvider {
         (m) => !keywords.some((k) => k.toLowerCase().includes(m))
       ),
     ];
-    variations.push(qualityAdded.join(", ") + paramsStr);
+    variations.push(qualityAdded.join(", "));
 
     // Variation 2: Swap styles
     const styleSwapped = keywords.map((k) => {
       const alt = styleAlternatives[k.toLowerCase()];
       return alt ?? k;
     });
-    variations.push(styleSwapped.join(", ") + paramsStr);
+    variations.push(styleSwapped.join(", "));
 
     // Variation 3: Swap lighting
     const lightSwapped = keywords.map((k) => {
       const alt = lightingAlternatives[k.toLowerCase()];
       return alt ?? k;
     });
-    variations.push(lightSwapped.join(", ") + paramsStr);
+    variations.push(lightSwapped.join(", "));
 
-    // Variation 4: Minimal version (keep first 3 keywords + params)
+    // Variation 4: Minimal version (keep first 3 keywords)
     const minimal = keywords.slice(0, 3);
-    variations.push(minimal.join(", ") + paramsStr);
+    variations.push(minimal.join(", "));
 
     return variations.slice(0, count);
   }
