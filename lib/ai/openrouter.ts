@@ -5,6 +5,12 @@ interface Message {
   content: string;
 }
 
+/** Strip any --flag parameters an LLM may have injected (e.g. --ar, --v, --no, --neg).
+ *  Model flags always appear at the end, so we strip from the first --flag onwards. */
+function stripModelFlags(text: string): string {
+  return text.replace(/\s*--[a-z]\S*.*$/i, "").trim();
+}
+
 export class OpenRouterProvider implements AiProvider {
   name = "OpenRouter";
   private apiKey: string;
@@ -50,14 +56,15 @@ export class OpenRouterProvider implements AiProvider {
 - Reorder keywords by importance (most important first)
 - Remove redundant terms
 - Add appropriate weights where beneficial
-- Suggest negative prompts if missing
 - Keep the user's creative intent intact
-- Return ONLY the optimized prompt text, no explanations.`;
+- Return ONLY the optimized prompt text as comma-separated keywords, no explanations
+- NEVER include model-specific parameters or flags (no --ar, --v, --no, --neg, --style, --s, --q, etc.) — those are handled separately by the application`;
 
-    return this.callApi([
+    const result = await this.callApi([
       { role: "system", content: systemPrompt },
       { role: "user", content: `Optimize this prompt:\n\n${prompt}` },
     ]);
+    return stripModelFlags(result);
   }
 
   async generateVariations(
@@ -71,7 +78,8 @@ export class OpenRouterProvider implements AiProvider {
 3. Simplified/minimal version
 4. Creative reinterpretation
 ${count > 4 ? "5-8. Additional creative explorations" : ""}
-Return each variation on a new line, separated by "---". No explanations, just the prompts.`;
+Return each variation on a new line, separated by "---". No explanations, just the prompts as comma-separated keywords.
+NEVER include model-specific parameters or flags (no --ar, --v, --no, --neg, --style, --s, --q, etc.) — those are handled separately by the application.`;
 
     const response = await this.callApi([
       { role: "system", content: systemPrompt },
@@ -82,7 +90,7 @@ Return each variation on a new line, separated by "---". No explanations, just t
     ]);
     return response
       .split("---")
-      .map((v) => v.trim())
+      .map((v) => stripModelFlags(v.trim()))
       .filter(Boolean);
   }
 
