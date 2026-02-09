@@ -3,9 +3,14 @@ export interface SavedPrompt {
   subject: string;
   styles: string[];
   lighting: string[];
+  cameraAngles?: string[];
+  colorPalette?: string[];
+  medium?: string[];
+  quality?: string[];
+  framing?: string[];
+  mood?: string[];
   composition: {
     aspectRatio: string;
-    cameraAngle: string;
   };
   details: string;
   negativePrompt: string;

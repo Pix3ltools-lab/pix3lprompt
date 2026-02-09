@@ -10,8 +10,13 @@ interface EditorState {
   customStyle: string;
   styleWeight: number;
   lighting: string[];
+  cameraAngles: string[];
+  colorPalette: string[];
+  medium: string[];
+  quality: string[];
+  framing: string[];
+  mood: string[];
   aspectRatio: string;
-  cameraAngle: string;
   details: string;
   negativePrompt: string;
   parameters: Record<string, string | number>;
@@ -33,17 +38,28 @@ interface EditorActions {
   setCustomStyle: (value: string) => void;
   setStyleWeight: (value: number) => void;
   setAspectRatio: (value: string) => void;
-  setCameraAngle: (value: string) => void;
   setTargetModel: (value: string) => void;
   setParameter: (key: string, value: string | number) => void;
 
   // Bulk setters
   setStyles: (styles: string[]) => void;
   setLighting: (lighting: string[]) => void;
+  setCameraAngles: (cameraAngles: string[]) => void;
+  setColorPalette: (colorPalette: string[]) => void;
+  setMedium: (medium: string[]) => void;
+  setQuality: (quality: string[]) => void;
+  setFraming: (framing: string[]) => void;
+  setMood: (mood: string[]) => void;
 
   // Toggle actions
   toggleStyle: (id: string) => void;
   toggleLighting: (id: string) => void;
+  toggleCameraAngle: (id: string) => void;
+  toggleColorPalette: (id: string) => void;
+  toggleMedium: (id: string) => void;
+  toggleQuality: (id: string) => void;
+  toggleFraming: (id: string) => void;
+  toggleMood: (id: string) => void;
 
   // UI actions
   setActivePanel: (panel: ActivePanel) => void;
@@ -62,8 +78,13 @@ const initialEditorState: EditorState = {
   customStyle: "",
   styleWeight: 1.0,
   lighting: [],
+  cameraAngles: [],
+  colorPalette: [],
+  medium: [],
+  quality: [],
+  framing: [],
+  mood: [],
   aspectRatio: "16:9",
-  cameraAngle: "",
   details: "",
   negativePrompt: "",
   parameters: {},
@@ -89,7 +110,6 @@ export const useStore = create<EditorState & EditorActions>()((set) => ({
   setCustomStyle: (value) => set({ customStyle: value }),
   setStyleWeight: (value) => set({ styleWeight: value }),
   setAspectRatio: (value) => set({ aspectRatio: value }),
-  setCameraAngle: (value) => set({ cameraAngle: value }),
   setTargetModel: (value) => set({ targetModel: value, parameters: {} }),
   setParameter: (key, value) =>
     set((state) => ({
@@ -98,10 +118,28 @@ export const useStore = create<EditorState & EditorActions>()((set) => ({
 
   setStyles: (styles) => set({ styles }),
   setLighting: (lighting) => set({ lighting }),
+  setCameraAngles: (cameraAngles) => set({ cameraAngles }),
+  setColorPalette: (colorPalette) => set({ colorPalette }),
+  setMedium: (medium) => set({ medium }),
+  setQuality: (quality) => set({ quality }),
+  setFraming: (framing) => set({ framing }),
+  setMood: (mood) => set({ mood }),
 
   toggleStyle: (id) => set((state) => ({ styles: toggleItem(state.styles, id) })),
   toggleLighting: (id) =>
     set((state) => ({ lighting: toggleItem(state.lighting, id) })),
+  toggleCameraAngle: (id) =>
+    set((state) => ({ cameraAngles: toggleItem(state.cameraAngles, id) })),
+  toggleColorPalette: (id) =>
+    set((state) => ({ colorPalette: toggleItem(state.colorPalette, id) })),
+  toggleMedium: (id) =>
+    set((state) => ({ medium: toggleItem(state.medium, id) })),
+  toggleQuality: (id) =>
+    set((state) => ({ quality: toggleItem(state.quality, id) })),
+  toggleFraming: (id) =>
+    set((state) => ({ framing: toggleItem(state.framing, id) })),
+  toggleMood: (id) =>
+    set((state) => ({ mood: toggleItem(state.mood, id) })),
 
   setActivePanel: (panel) => set({ activePanel: panel }),
   setParametersPanelOpen: (open) => set({ isParametersPanelOpen: open }),
@@ -114,8 +152,13 @@ export const useStore = create<EditorState & EditorActions>()((set) => ({
       subject: prompt.subject,
       styles: prompt.styles,
       lighting: prompt.lighting,
+      cameraAngles: prompt.cameraAngles ?? [],
+      colorPalette: prompt.colorPalette ?? [],
+      medium: prompt.medium ?? [],
+      quality: prompt.quality ?? [],
+      framing: prompt.framing ?? [],
+      mood: prompt.mood ?? [],
       aspectRatio: prompt.composition.aspectRatio,
-      cameraAngle: prompt.composition.cameraAngle,
       details: prompt.details,
       negativePrompt: prompt.negativePrompt,
       parameters: prompt.parameters,

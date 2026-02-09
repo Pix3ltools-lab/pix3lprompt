@@ -7,7 +7,17 @@ import { Separator } from "@/components/ui/separator";
 import {
   Copy, Sparkles, Shuffle, Send, Check, RotateCcw, Save, Settings, Loader2, X,
 } from "lucide-react";
-import { styleChips, lightingPresets } from "@/data/mock";
+import {
+  styleChips,
+  lightingPresets,
+  cameraAnglePresets,
+  colorPalettePresets,
+  mediumPresets,
+  qualityPresets,
+  framingPresets,
+  moodPresets,
+  type Preset,
+} from "@/data/mock";
 import { getModelConfig } from "@/data/models";
 import { useStore } from "@/lib/store";
 import { useHistory } from "@/hooks/useHistory";
@@ -17,6 +27,39 @@ import Link from "next/link";
 
 const aspectRatios = ["16:9", "3:2", "1:1", "9:16", "4:5", "21:9"];
 
+/** Reusable chip section */
+function ChipSection({
+  label,
+  presets,
+  selected,
+  onToggle,
+}: {
+  label: string;
+  presets: Preset[];
+  selected: string[];
+  onToggle: (id: string) => void;
+}) {
+  return (
+    <section>
+      <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </label>
+      <div className="flex flex-wrap gap-1.5">
+        {presets.map((p) => (
+          <Badge
+            key={p.id}
+            variant={selected.includes(p.id) ? "default" : "outline"}
+            className="cursor-pointer select-none transition-colors"
+            onClick={() => onToggle(p.id)}
+          >
+            {p.label}
+          </Badge>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export function EditorPanel() {
   const subject = useStore((s) => s.subject);
   const setSubject = useStore((s) => s.setSubject);
@@ -24,13 +67,24 @@ export function EditorPanel() {
   const toggleStyle = useStore((s) => s.toggleStyle);
   const lighting = useStore((s) => s.lighting);
   const toggleLighting = useStore((s) => s.toggleLighting);
+  const cameraAngles = useStore((s) => s.cameraAngles);
+  const toggleCameraAngle = useStore((s) => s.toggleCameraAngle);
+  const colorPalette = useStore((s) => s.colorPalette);
+  const toggleColorPalette = useStore((s) => s.toggleColorPalette);
+  const medium = useStore((s) => s.medium);
+  const toggleMedium = useStore((s) => s.toggleMedium);
+  const quality = useStore((s) => s.quality);
+  const toggleQuality = useStore((s) => s.toggleQuality);
+  const framing = useStore((s) => s.framing);
+  const toggleFraming = useStore((s) => s.toggleFraming);
+  const mood = useStore((s) => s.mood);
+  const toggleMood = useStore((s) => s.toggleMood);
   const aspectRatio = useStore((s) => s.aspectRatio);
   const setAspectRatio = useStore((s) => s.setAspectRatio);
   const details = useStore((s) => s.details);
   const setDetails = useStore((s) => s.setDetails);
   const negativePrompt = useStore((s) => s.negativePrompt);
   const setNegativePrompt = useStore((s) => s.setNegativePrompt);
-  const cameraAngle = useStore((s) => s.cameraAngle);
   const parameters = useStore((s) => s.parameters);
   const targetModel = useStore((s) => s.targetModel);
   const editingPromptId = useStore((s) => s.editingPromptId);
@@ -38,6 +92,12 @@ export function EditorPanel() {
 
   const setStyles = useStore((s) => s.setStyles);
   const setLighting = useStore((s) => s.setLighting);
+  const setCameraAngles = useStore((s) => s.setCameraAngles);
+  const setColorPalette = useStore((s) => s.setColorPalette);
+  const setMedium = useStore((s) => s.setMedium);
+  const setQuality = useStore((s) => s.setQuality);
+  const setFraming = useStore((s) => s.setFraming);
+  const setMood = useStore((s) => s.setMood);
 
   const { savePrompt, updatePrompt } = useHistory();
   const { optimize, generateVariations, isLoading: aiLoading, isLocal, error: aiError } = useAiProvider();
@@ -48,39 +108,53 @@ export function EditorPanel() {
 
   const modelConfig = useMemo(() => getModelConfig(targetModel), [targetModel]);
 
-  const assembledPrompt = useMemo(() => {
+  // All chip arrays mapped to their preset lookup
+  const chipArrays: { selected: string[]; presets: Preset[] }[] = [
+    { selected: styles, presets: styleChips },
+    { selected: lighting, presets: lightingPresets },
+    { selected: cameraAngles, presets: cameraAnglePresets },
+    { selected: colorPalette, presets: colorPalettePresets },
+    { selected: medium, presets: mediumPresets },
+    { selected: quality, presets: qualityPresets },
+    { selected: framing, presets: framingPresets },
+    { selected: mood, presets: moodPresets },
+  ];
+
+  /** Resolve selected chip IDs to labels */
+  function resolveChips(selected: string[], presets: Preset[]): string {
+    return selected
+      .map((id) => presets.find((p) => p.id === id)?.label ?? id)
+      .join(", ");
+  }
+
+  /** Build content parts (all chip labels + details, no model params) */
+  function buildContentParts(): string[] {
     const parts: string[] = [];
     if (subject.trim()) parts.push(subject.trim());
-    if (styles.length > 0) {
-      parts.push(
-        styles
-          .map((id) => styleChips.find((c) => c.id === id)?.label ?? id)
-          .join(", ")
-      );
-    }
-    if (lighting.length > 0) {
-      parts.push(
-        lighting
-          .map((id) => lightingPresets.find((p) => p.id === id)?.label ?? id)
-          .join(", ")
-      );
+    for (const { selected, presets } of chipArrays) {
+      if (selected.length > 0) parts.push(resolveChips(selected, presets));
     }
     if (details.trim()) parts.push(details.trim());
-    let prompt = parts.join(", ");
+    return parts;
+  }
 
-    // Model-specific aspect ratio
+  const assembledPrompt = useMemo(() => {
+    let prompt = buildContentParts().join(", ");
+
     const arStr = modelConfig.arFormat(aspectRatio);
     if (arStr) prompt += ` ${arStr}`;
-
-    // Model-specific suffix (e.g. --v 6.1)
     if (modelConfig.suffix) prompt += ` ${modelConfig.suffix}`;
-
-    // Model-specific negative prompt
     const negStr = modelConfig.negFormat(negativePrompt.trim());
     if (negStr) prompt += ` ${negStr}`;
 
     return prompt;
-  }, [subject, styles, lighting, aspectRatio, details, negativePrompt, targetModel, modelConfig]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subject, styles, lighting, cameraAngles, colorPalette, medium, quality, framing, mood, aspectRatio, details, negativePrompt, targetModel, modelConfig]);
+
+  const contentPrompt = useMemo(() => {
+    return buildContentParts().join(", ");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subject, styles, lighting, cameraAngles, colorPalette, medium, quality, framing, mood, details]);
 
   const charCount = assembledPrompt.length;
   const tokenEstimate = Math.max(1, Math.round(charCount / 4));
@@ -97,7 +171,13 @@ export function EditorPanel() {
       subject,
       styles,
       lighting,
-      composition: { aspectRatio, cameraAngle },
+      cameraAngles,
+      colorPalette,
+      medium,
+      quality,
+      framing,
+      mood,
+      composition: { aspectRatio },
       details,
       negativePrompt,
       parameters,
@@ -118,27 +198,17 @@ export function EditorPanel() {
     setTimeout(() => setSaved(false), 1500);
   }
 
-  // Content-only prompt for AI optimization (no model-specific params like --ar, --v, --no)
-  const contentPrompt = useMemo(() => {
-    const parts: string[] = [];
-    if (subject.trim()) parts.push(subject.trim());
-    if (styles.length > 0) {
-      parts.push(
-        styles
-          .map((id) => styleChips.find((c) => c.id === id)?.label ?? id)
-          .join(", ")
-      );
-    }
-    if (lighting.length > 0) {
-      parts.push(
-        lighting
-          .map((id) => lightingPresets.find((p) => p.id === id)?.label ?? id)
-          .join(", ")
-      );
-    }
-    if (details.trim()) parts.push(details.trim());
-    return parts.join(", ");
-  }, [subject, styles, lighting, details]);
+  function clearAllChips() {
+    setStyles([]);
+    setLighting([]);
+    setCameraAngles([]);
+    setColorPalette([]);
+    setMedium([]);
+    setQuality([]);
+    setFraming([]);
+    setMood([]);
+    setDetails("");
+  }
 
   const buildContext = () => ({
     targetModel,
@@ -150,11 +220,8 @@ export function EditorPanel() {
   async function handleOptimize() {
     if (!contentPrompt) return;
     const result = await optimize(contentPrompt, buildContext());
-    // Put result in subject; clear styles/lighting/details since they are now merged in
     setSubject(result);
-    setStyles([]);
-    setLighting([]);
-    setDetails("");
+    clearAllChips();
   }
 
   async function handleVariations() {
@@ -163,13 +230,25 @@ export function EditorPanel() {
     setVariations(result);
   }
 
+  // Preview color map for each chip category
+  const previewColors = [
+    { selected: styles, presets: styleChips, color: "text-green-400" },
+    { selected: lighting, presets: lightingPresets, color: "text-yellow-400" },
+    { selected: cameraAngles, presets: cameraAnglePresets, color: "text-cyan-400" },
+    { selected: colorPalette, presets: colorPalettePresets, color: "text-pink-400" },
+    { selected: medium, presets: mediumPresets, color: "text-amber-400" },
+    { selected: quality, presets: qualityPresets, color: "text-lime-400" },
+    { selected: framing, presets: framingPresets, color: "text-indigo-400" },
+    { selected: mood, presets: moodPresets, color: "text-rose-400" },
+  ];
+
   function renderPreview() {
-    if (
-      !subject.trim() &&
-      styles.length === 0 &&
-      lighting.length === 0 &&
-      !details.trim()
-    ) {
+    const hasContent =
+      subject.trim() ||
+      chipArrays.some((c) => c.selected.length > 0) ||
+      details.trim();
+
+    if (!hasContent) {
       return (
         <span className="text-muted-foreground">
           Your prompt will appear here...
@@ -196,25 +275,11 @@ export function EditorPanel() {
     }
 
     if (subject.trim()) addSegment(subject.trim(), "text-blue-400");
-    if (styles.length > 0) {
-      addSegment(
-        styles
-          .map((id) => styleChips.find((c) => c.id === id)?.label ?? id)
-          .join(", "),
-        "text-green-400"
-      );
-    }
-    if (lighting.length > 0) {
-      addSegment(
-        lighting
-          .map((id) => lightingPresets.find((p) => p.id === id)?.label ?? id)
-          .join(", "),
-        "text-yellow-400"
-      );
+    for (const { selected, presets, color } of previewColors) {
+      if (selected.length > 0) addSegment(resolveChips(selected, presets), color);
     }
     if (details.trim()) addSegment(details.trim(), "text-slate-300");
 
-    // Model-specific params (AR, suffix, negative) shown in orange/red
     const arStr = modelConfig.arFormat(aspectRatio);
     if (arStr) {
       segments.push(<span key="ar-sp" className="text-foreground"> </span>);
@@ -270,48 +335,20 @@ export function EditorPanel() {
         />
       </section>
 
-      {/* Style Chips */}
-      <section>
-        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Style
-        </label>
-        <div className="flex flex-wrap gap-1.5">
-          {styleChips.map((chip) => (
-            <Badge
-              key={chip.id}
-              variant={styles.includes(chip.id) ? "default" : "outline"}
-              className="cursor-pointer select-none transition-colors"
-              onClick={() => toggleStyle(chip.id)}
-            >
-              {chip.label}
-            </Badge>
-          ))}
-        </div>
-      </section>
+      {/* Chip Sections */}
+      <ChipSection label="Style" presets={styleChips} selected={styles} onToggle={toggleStyle} />
+      <ChipSection label="Lighting" presets={lightingPresets} selected={lighting} onToggle={toggleLighting} />
+      <ChipSection label="Camera Angle" presets={cameraAnglePresets} selected={cameraAngles} onToggle={toggleCameraAngle} />
+      <ChipSection label="Color Palette" presets={colorPalettePresets} selected={colorPalette} onToggle={toggleColorPalette} />
+      <ChipSection label="Medium / Texture" presets={mediumPresets} selected={medium} onToggle={toggleMedium} />
+      <ChipSection label="Quality" presets={qualityPresets} selected={quality} onToggle={toggleQuality} />
+      <ChipSection label="Framing" presets={framingPresets} selected={framing} onToggle={toggleFraming} />
+      <ChipSection label="Mood" presets={moodPresets} selected={mood} onToggle={toggleMood} />
 
-      {/* Lighting Chips */}
+      {/* Aspect Ratio */}
       <section>
         <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Lighting
-        </label>
-        <div className="flex flex-wrap gap-1.5">
-          {lightingPresets.map((preset) => (
-            <Badge
-              key={preset.id}
-              variant={lighting.includes(preset.id) ? "default" : "outline"}
-              className="cursor-pointer select-none transition-colors"
-              onClick={() => toggleLighting(preset.id)}
-            >
-              {preset.label}
-            </Badge>
-          ))}
-        </div>
-      </section>
-
-      {/* Composition */}
-      <section>
-        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Composition
+          Aspect Ratio
         </label>
         <div className="flex flex-wrap gap-2">
           {aspectRatios.map((ratio) => (
@@ -342,7 +379,7 @@ export function EditorPanel() {
           id="details"
           value={details}
           onChange={(e) => setDetails(e.target.value)}
-          placeholder="Additional details, quality modifiers..."
+          placeholder="Additional details, modifiers..."
           rows={2}
           className="w-full resize-none rounded-lg border border-input bg-background p-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
         />
@@ -479,9 +516,7 @@ export function EditorPanel() {
                 key={i}
                 onClick={() => {
                   setSubject(v);
-                  setStyles([]);
-                  setLighting([]);
-                  setDetails("");
+                  clearAllChips();
                   setVariations(null);
                 }}
                 className="rounded-lg border border-border bg-background p-3 text-left font-mono text-xs leading-relaxed transition-colors hover:bg-elevated"

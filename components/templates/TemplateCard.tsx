@@ -10,23 +10,22 @@ interface TemplateCardProps {
 }
 
 export function TemplateCard({ template }: TemplateCardProps) {
-  const setSubject = useStore((s) => s.setSubject);
-  const setDetails = useStore((s) => s.setDetails);
-  const setAspectRatio = useStore((s) => s.setAspectRatio);
-  const setActivePanel = useStore((s) => s.setActivePanel);
   const store = useStore();
 
   function handleUse() {
-    // Reset first, then populate from template
     store.resetEditor();
-    setSubject(template.subject);
-    setDetails(template.details);
-    setAspectRatio(template.aspectRatio);
-    // Set styles and lighting by toggling each one
+    store.setSubject(template.subject);
+    store.setDetails(template.details);
+    store.setAspectRatio(template.aspectRatio);
     template.styles.forEach((s) => store.toggleStyle(s));
     template.lighting.forEach((l) => store.toggleLighting(l));
-    // Switch to editor on mobile
-    setActivePanel("editor");
+    template.cameraAngles?.forEach((c) => store.toggleCameraAngle(c));
+    template.colorPalette?.forEach((c) => store.toggleColorPalette(c));
+    template.medium?.forEach((m) => store.toggleMedium(m));
+    template.quality?.forEach((q) => store.toggleQuality(q));
+    template.framing?.forEach((f) => store.toggleFraming(f));
+    template.mood?.forEach((m) => store.toggleMood(m));
+    store.setActivePanel("editor");
   }
 
   return (

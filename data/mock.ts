@@ -11,15 +11,13 @@ export interface MockPrompt {
   createdAt: string;
 }
 
-export interface StyleChip {
+export interface Preset {
   id: string;
   label: string;
 }
 
-export interface LightingPreset {
-  id: string;
-  label: string;
-}
+export type StyleChip = Preset;
+export type LightingPreset = Preset;
 
 export interface Template {
   id: number;
@@ -28,6 +26,12 @@ export interface Template {
   preview: string;
   styles: string[];
   lighting: string[];
+  cameraAngles?: string[];
+  colorPalette?: string[];
+  medium?: string[];
+  quality?: string[];
+  framing?: string[];
+  mood?: string[];
   aspectRatio: string;
   details: string;
   category: "image" | "video" | "audio";
@@ -131,6 +135,81 @@ export const lightingPresets: LightingPreset[] = [
   { id: "bioluminescent", label: "Bioluminescent" },
 ];
 
+export const cameraAnglePresets: Preset[] = [
+  { id: "close-up", label: "Close-Up" },
+  { id: "wide-shot", label: "Wide Shot" },
+  { id: "birds-eye", label: "Bird's Eye" },
+  { id: "low-angle", label: "Low Angle" },
+  { id: "dutch-angle", label: "Dutch Angle" },
+  { id: "over-the-shoulder", label: "Over the Shoulder" },
+  { id: "pov", label: "POV" },
+  { id: "macro", label: "Macro" },
+  { id: "medium-shot", label: "Medium Shot" },
+  { id: "aerial", label: "Aerial" },
+];
+
+export const colorPalettePresets: Preset[] = [
+  { id: "warm-tones", label: "Warm Tones" },
+  { id: "cool-tones", label: "Cool Tones" },
+  { id: "monochrome", label: "Monochrome" },
+  { id: "pastel", label: "Pastel" },
+  { id: "desaturated", label: "Desaturated" },
+  { id: "high-contrast", label: "High Contrast" },
+  { id: "earth-tones", label: "Earth Tones" },
+  { id: "neon-colors", label: "Neon Colors" },
+  { id: "sepia", label: "Sepia" },
+  { id: "vibrant", label: "Vibrant" },
+];
+
+export const mediumPresets: Preset[] = [
+  { id: "film-grain", label: "Film Grain" },
+  { id: "canvas-texture", label: "Canvas Texture" },
+  { id: "paper-texture", label: "Paper Texture" },
+  { id: "glitch", label: "Glitch" },
+  { id: "halftone", label: "Halftone" },
+  { id: "soft-focus", label: "Soft Focus" },
+  { id: "double-exposure", label: "Double Exposure" },
+  { id: "long-exposure", label: "Long Exposure" },
+  { id: "tilt-shift", label: "Tilt Shift" },
+  { id: "noise-grain", label: "Noise / Grain" },
+];
+
+export const qualityPresets: Preset[] = [
+  { id: "8k", label: "8K" },
+  { id: "highly-detailed", label: "Highly Detailed" },
+  { id: "masterpiece", label: "Masterpiece" },
+  { id: "award-winning", label: "Award Winning" },
+  { id: "professional", label: "Professional" },
+  { id: "raw-photo", label: "RAW Photo" },
+  { id: "ultra-sharp", label: "Ultra Sharp" },
+  { id: "hdr", label: "HDR" },
+];
+
+export const framingPresets: Preset[] = [
+  { id: "rule-of-thirds", label: "Rule of Thirds" },
+  { id: "centered", label: "Centered" },
+  { id: "symmetrical", label: "Symmetrical" },
+  { id: "golden-ratio", label: "Golden Ratio" },
+  { id: "negative-space", label: "Negative Space" },
+  { id: "full-body", label: "Full Body" },
+  { id: "headshot", label: "Headshot" },
+  { id: "portrait-framing", label: "Portrait" },
+  { id: "panoramic", label: "Panoramic" },
+];
+
+export const moodPresets: Preset[] = [
+  { id: "dreamy", label: "Dreamy" },
+  { id: "dark", label: "Dark" },
+  { id: "nostalgic", label: "Nostalgic" },
+  { id: "serene", label: "Serene" },
+  { id: "chaotic", label: "Chaotic" },
+  { id: "mysterious", label: "Mysterious" },
+  { id: "whimsical", label: "Whimsical" },
+  { id: "epic", label: "Epic" },
+  { id: "melancholic", label: "Melancholic" },
+  { id: "romantic", label: "Romantic" },
+];
+
 export const templates: Template[] = [
   // ── Image Templates ──────────────────────────────────────────────
   {
@@ -141,8 +220,13 @@ export const templates: Template[] = [
       "A portrait with cinematic lighting, shallow depth of field, dramatic shadows",
     styles: ["cinematic"],
     lighting: ["dramatic-shadows", "rim-light"],
+    cameraAngles: ["close-up"],
+    medium: ["film-grain"],
+    quality: ["ultra-sharp"],
+    framing: ["portrait-framing"],
+    mood: ["mysterious"],
     aspectRatio: "3:2",
-    details: "sharp focus, film grain, bokeh background",
+    details: "bokeh background",
     category: "image",
   },
   {
@@ -153,8 +237,12 @@ export const templates: Template[] = [
       "An epic fantasy landscape with mountains, waterfalls, and magical atmosphere",
     styles: ["concept-art"],
     lighting: ["volumetric", "golden-hour"],
+    cameraAngles: ["wide-shot"],
+    quality: ["highly-detailed"],
+    framing: ["panoramic"],
+    mood: ["epic"],
     aspectRatio: "16:9",
-    details: "highly detailed, epic scale, magical atmosphere",
+    details: "magical atmosphere",
     category: "image",
   },
   {
@@ -165,8 +253,10 @@ export const templates: Template[] = [
       "Clean product photography on white background, studio lighting, sharp focus",
     styles: ["photorealistic"],
     lighting: ["studio-lighting"],
+    quality: ["ultra-sharp", "professional"],
+    framing: ["centered"],
     aspectRatio: "1:1",
-    details: "sharp focus, high resolution, commercial quality",
+    details: "commercial quality",
     category: "image",
   },
   {
@@ -177,8 +267,11 @@ export const templates: Template[] = [
       "Abstract composition with bold colors, geometric shapes, modern art style",
     styles: ["minimalist"],
     lighting: ["ethereal"],
+    colorPalette: ["vibrant"],
+    framing: ["centered", "negative-space"],
+    mood: ["serene"],
     aspectRatio: "1:1",
-    details: "modern art, bold palette, clean lines",
+    details: "modern art, clean lines",
     category: "image",
   },
   {
@@ -189,8 +282,12 @@ export const templates: Template[] = [
       "Cyberpunk cityscape with neon lights, rain-slicked streets, futuristic architecture",
     styles: ["cyberpunk"],
     lighting: ["neon-glow", "foggy"],
+    cameraAngles: ["low-angle"],
+    colorPalette: ["neon-colors"],
+    framing: ["panoramic"],
+    mood: ["dark"],
     aspectRatio: "21:9",
-    details: "futuristic architecture, reflections, cinematic composition",
+    details: "futuristic architecture, reflections",
     category: "image",
   },
   {
@@ -201,8 +298,11 @@ export const templates: Template[] = [
       "Delicate watercolor painting of flowers in a garden, soft pastel colors",
     styles: ["watercolor"],
     lighting: ["natural-light"],
+    colorPalette: ["pastel"],
+    medium: ["paper-texture"],
+    mood: ["serene"],
     aspectRatio: "4:5",
-    details: "soft pastel colors, delicate brushstrokes, paper texture",
+    details: "delicate brushstrokes",
     category: "image",
   },
   {
@@ -213,8 +313,11 @@ export const templates: Template[] = [
       "Full-body anime character in dramatic pose, cel-shading, vibrant colors",
     styles: ["anime"],
     lighting: ["rim-light"],
+    colorPalette: ["vibrant"],
+    framing: ["full-body"],
+    mood: ["epic"],
     aspectRatio: "9:16",
-    details: "cel-shading, vibrant colors, clean linework",
+    details: "cel-shading, clean linework",
     category: "image",
   },
   {
@@ -225,8 +328,11 @@ export const templates: Template[] = [
       "Modern minimalist house surrounded by lush nature, clean geometry",
     styles: ["3d-render", "minimalist"],
     lighting: ["natural-light"],
+    cameraAngles: ["wide-shot"],
+    quality: ["ultra-sharp"],
+    framing: ["rule-of-thirds"],
     aspectRatio: "16:9",
-    details: "architectural photography, clean geometry, ultra sharp",
+    details: "architectural photography, clean geometry",
     category: "image",
   },
   {
@@ -237,8 +343,12 @@ export const templates: Template[] = [
       "Gourmet dish on a rustic wooden table, studio lighting, shallow depth of field",
     styles: ["photorealistic"],
     lighting: ["studio-lighting", "backlit"],
+    cameraAngles: ["birds-eye"],
+    colorPalette: ["warm-tones"],
+    medium: ["soft-focus"],
+    quality: ["professional"],
     aspectRatio: "4:5",
-    details: "overhead shot, food styling, shallow depth of field",
+    details: "food styling",
     category: "image",
   },
   {
@@ -249,8 +359,10 @@ export const templates: Template[] = [
       "Vintage travel poster of a coastal town, screen print, limited color palette",
     styles: ["retro", "pop-art"],
     lighting: ["golden-hour"],
+    medium: ["halftone"],
+    mood: ["nostalgic"],
     aspectRatio: "9:16",
-    details: "screen print, limited color palette, bold typography",
+    details: "screen print, bold typography",
     category: "image",
   },
   {
@@ -261,8 +373,12 @@ export const templates: Template[] = [
       "Ancient cathedral interior with stained glass, candlelight, moody atmosphere",
     styles: ["gothic"],
     lighting: ["candlelight", "volumetric"],
+    cameraAngles: ["low-angle"],
+    colorPalette: ["desaturated"],
+    quality: ["highly-detailed"],
+    mood: ["dark", "mysterious"],
     aspectRatio: "3:2",
-    details: "intricate details, stone texture, moody atmosphere",
+    details: "stone texture",
     category: "image",
   },
   {
@@ -273,6 +389,10 @@ export const templates: Template[] = [
       "Tiny medieval village with market square, isometric view, miniature scene",
     styles: ["low-poly", "pixel-art"],
     lighting: ["natural-light"],
+    cameraAngles: ["birds-eye"],
+    colorPalette: ["vibrant"],
+    framing: ["centered"],
+    mood: ["whimsical"],
     aspectRatio: "1:1",
     details: "isometric view, game asset, miniature scene",
     category: "image",
@@ -285,8 +405,11 @@ export const templates: Template[] = [
       "Astronaut before a massive alien structure, epic scale, sci-fi atmosphere",
     styles: ["concept-art", "cinematic"],
     lighting: ["backlit", "ethereal"],
+    cameraAngles: ["low-angle"],
+    quality: ["8k", "highly-detailed"],
+    mood: ["epic", "mysterious"],
     aspectRatio: "9:16",
-    details: "epic scale, lens flare, sci-fi atmosphere",
+    details: "lens flare, sci-fi atmosphere",
     category: "image",
   },
   {
@@ -297,8 +420,12 @@ export const templates: Template[] = [
       "Renaissance-style portrait of a woman with flowers, visible brushstrokes",
     styles: ["oil-painting", "art-nouveau"],
     lighting: ["dramatic-shadows"],
+    colorPalette: ["warm-tones"],
+    medium: ["canvas-texture"],
+    quality: ["masterpiece"],
+    framing: ["portrait-framing", "golden-ratio"],
     aspectRatio: "3:2",
-    details: "visible brushstrokes, rich textures, classical composition",
+    details: "visible brushstrokes, rich textures",
     category: "image",
   },
   {
@@ -309,8 +436,11 @@ export const templates: Template[] = [
       "Silhouette of a wolf merged with a forest, double exposure, ethereal mood",
     styles: ["surrealist"],
     lighting: ["moonlight", "foggy"],
+    medium: ["double-exposure"],
+    quality: ["highly-detailed"],
+    mood: ["dreamy", "mysterious"],
     aspectRatio: "16:9",
-    details: "double exposure effect, ethereal mood, fine detail",
+    details: "ethereal mood, fine detail",
     category: "image",
   },
   {
@@ -321,8 +451,12 @@ export const templates: Template[] = [
       "Rainy Tokyo alley at night, neon reflections, wet asphalt, street level",
     styles: ["photorealistic", "cyberpunk"],
     lighting: ["neon-glow", "harsh-flash"],
+    cameraAngles: ["pov"],
+    colorPalette: ["neon-colors", "high-contrast"],
+    medium: ["film-grain"],
+    mood: ["dark"],
     aspectRatio: "9:16",
-    details: "wet asphalt reflections, motion blur, street level",
+    details: "wet asphalt reflections, motion blur",
     category: "image",
   },
   // ── Video Templates ──────────────────────────────────────────────
@@ -334,6 +468,11 @@ export const templates: Template[] = [
       "Aerial view of waves crashing on rocky coastline, slow motion, golden hour",
     styles: ["cinematic"],
     lighting: ["golden-hour"],
+    cameraAngles: ["aerial"],
+    colorPalette: ["warm-tones"],
+    quality: ["8k"],
+    framing: ["panoramic"],
+    mood: ["epic", "serene"],
     aspectRatio: "21:9",
     details: "slow motion, camera pulling back, ocean spray",
     category: "video",
@@ -346,6 +485,8 @@ export const templates: Template[] = [
       "Abstract particles morphing in rhythm, seamless loop, vibrant gradients",
     styles: ["vaporwave"],
     lighting: ["neon-glow", "ethereal"],
+    colorPalette: ["neon-colors"],
+    mood: ["dreamy"],
     aspectRatio: "16:9",
     details: "seamless loop, pulsating motion, vibrant gradients",
     category: "video",
