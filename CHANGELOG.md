@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] - 2026-02-09
+
+### Added
+
+- **14 new templates** — Anime Character, Architectural Viz, Food Photography, Retro Poster, Dark Gothic Scene, Isometric Game Asset, Sci-Fi Book Cover, Oil Portrait Master, Dreamy Double Exposure, Street Photography, Cinematic Drone Shot, Music Video Loop, Lo-Fi Beat, Epic Trailer Music
+- **Template categories by media type** — Templates panel now organized into Image (16), Video (2), Audio (2) sections with icons and counts
+- **Architecture skill** — `/architecture` slash command for Claude Code with full codebase reference
+
+### Fixed
+
+- **Duplicate model parameters in optimized prompts** — Optimize and Variations were passing the full assembled prompt (including `--ar`, `--v`, `--no`) to the AI provider, then placing the result back into the subject field causing `--ar` and `--v` to appear twice
+- **Wrong Midjourney flags from LLM** — OpenRouter system prompt instructed the LLM to "suggest negative prompts", causing hallucinated flags like `--negatives` or `--neg` instead of `--no`
+- **LLM flag injection safety net** — Added `stripModelFlags()` sanitizer that strips any `--flag` from AI provider responses as a fallback
+- **Local rules injecting `--no`** — Removed negative prompt injection from LocalRulesProvider since that is the assembler's responsibility
+- **Template badge crash** — Fixed crash on templates with no styles (audio templates)
+- **Hidden templates** — Previously, 2 templates with "favorites" category were never rendered; now all templates are visible under proper media sections
+
+### Changed
+
+- **Optimizer receives content-only prompts** — AI providers now receive only keywords (subject, styles, lighting, details) without model-specific parameters; styles, lighting and details are cleared after optimization since they are merged into the result
+- **Template category type** — Changed from `"quick-start" | "favorites"` to `"image" | "video" | "audio"`
+
 ## [1.0.0] - 2026-02-08
 
 ### Added
@@ -26,4 +48,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - **Dark mode** — Dark theme by default with light mode toggle via next-themes
 - **Copy to clipboard** — One-click copy with visual feedback
 
+[1.1.0]: https://github.com/Pix3ltools-lab/pix3lprompt/releases/tag/v1.1.0
 [1.0.0]: https://github.com/Pix3ltools-lab/pix3lprompt/releases/tag/v1.0.0

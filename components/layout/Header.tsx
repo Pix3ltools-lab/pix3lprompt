@@ -22,7 +22,7 @@ export function Header() {
             <span className="text-foreground">Prompt</span>
           </Link>
           <span className="text-xs font-medium text-muted-foreground">
-            v1.0.0
+            v1.1.0
           </span>
         </div>
 
