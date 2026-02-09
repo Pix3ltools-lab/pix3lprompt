@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { StorageWarning } from "@/components/layout/StorageWarning";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const inter = Inter({
@@ -37,6 +38,7 @@ export default function RootLayout({
           <StorageWarning />
           <div className="flex min-h-0 flex-1 flex-col">{children}</div>
           <Footer />
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

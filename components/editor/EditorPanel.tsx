@@ -24,6 +24,7 @@ import { useHistory } from "@/hooks/useHistory";
 import { useAiProvider } from "@/hooks/useAiProvider";
 import { ModelSelector } from "@/components/editor/ModelSelector";
 import Link from "next/link";
+import { toast } from "sonner";
 
 const aspectRatios = ["16:9", "3:2", "1:1", "9:16", "4:5", "21:9"];
 
@@ -474,9 +475,19 @@ export function EditorPanel() {
           )}
           Variations
         </Button>
-        <Button size="sm" variant="outline" className="gap-1.5">
+        <Button
+          size="sm"
+          variant="outline"
+          className="gap-1.5"
+          onClick={() =>
+            toast.info("Pix3lBoard integration is coming soon!", {
+              description:
+                "Send prompts directly to Pix3lBoard to organize your creative projects. Stay tuned for a future update.",
+            })
+          }
+        >
           <Send className="h-3.5 w-3.5" />
-          Send to Board
+          Send to Pix3lBoard
         </Button>
         <Button
           size="sm"
