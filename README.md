@@ -13,6 +13,7 @@ An intelligent prompt editor for AI image, video and audio generators. Craft, op
 - **Prompt history** — Save, rate (1-5 stars), tag, favorite, search and reload past prompts
 - **Templates** — Quick-start templates and auto-populated favorites (rating >= 4 stars)
 - **100% client-side** — All data stored in IndexedDB, nothing leaves your browser unless you opt into an AI provider
+- **Installable PWA** — Install as a standalone desktop or mobile app from Chrome/Edge with offline support
 - **Dark mode** — Dark theme by default with light mode toggle
 - **Responsive** — 3-column desktop layout (History | Editor | Templates), tab-based mobile layout with bottom nav
 
@@ -70,6 +71,18 @@ npm start
 8. **Copy** to clipboard or **Save** to history
 9. **Optimize** with AI or generate **Variations**
 10. **Browse history** to reload, rate, and refine past prompts
+
+## Install as Desktop App (PWA)
+
+Pix3lPrompt can be installed as a standalone app on desktop and mobile:
+
+1. Open the app in **Chrome** or **Edge**
+2. Click the install icon in the address bar (monitor with arrow) or go to **Menu (⋮) → Install Pix3lPrompt...**
+3. The app opens in its own window — no address bar, with its own taskbar icon
+
+On mobile, use **"Add to Home Screen"** from the browser menu. The app works offline after the first visit.
+
+> **Note:** Firefox desktop does not support PWA installation. Use Chrome or Edge.
 
 ## Project Structure
 

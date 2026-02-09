@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.0] - 2026-02-09
+
+### Added
+
+- **Progressive Web App (PWA)** — Pix3lPrompt is now installable as a standalone desktop/mobile app from Chrome and Edge with its own window, taskbar icon and offline caching
+- **Web App Manifest** — `app/manifest.ts` with app identity, theme colors, start URL, display mode and screenshot previews
+- **Service Worker** — Network-first caching strategy for offline resilience with automatic cache versioning
+- **Custom app icon** — Pixel-art "P" icon in violet theme, generated in SVG, PNG 192x192, PNG 512x512 and Apple Touch Icon formats
+- **Apple Web App support** — Meta tags and apple-touch-icon for iOS home screen installation
+- **Icon generation scripts** — `scripts/generate-icons.mjs` and `scripts/generate-screenshots.mjs` for reproducible asset generation via sharp
+
 ## [1.2.0] - 2026-02-09
 
 ### Added
@@ -68,6 +79,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - **Dark mode** — Dark theme by default with light mode toggle via next-themes
 - **Copy to clipboard** — One-click copy with visual feedback
 
+[1.3.0]: https://github.com/Pix3ltools-lab/pix3lprompt/releases/tag/v1.3.0
 [1.2.0]: https://github.com/Pix3ltools-lab/pix3lprompt/releases/tag/v1.2.0
 [1.1.0]: https://github.com/Pix3ltools-lab/pix3lprompt/releases/tag/v1.1.0
 [1.0.0]: https://github.com/Pix3ltools-lab/pix3lprompt/releases/tag/v1.0.0
