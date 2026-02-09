@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] - 2026-02-09
+
+### Added
+
+- **6 new chip sections** — Camera Angle (10 presets), Color Palette (10), Medium/Texture (10), Quality (8), Framing (9), Mood (10) — 57 new presets total with color-coded live preview
+- **Gemini Flash Image and Gemini Pro Image models** — Google Gemini image generation with natural language prompts, no negative prompt, plain aspect ratio
+- **Toast notifications** — Sonner toast component via shadcn/ui; "Send to Pix3lBoard" button now shows a coming-soon info toast
+- **Reusable ChipSection component** — Extracted chip rendering into a shared component reducing editor code duplication
+
+### Fixed
+
+- **Camera Angle and Framing are now single-select** — Mutually exclusive options (e.g. Close-Up vs Wide Shot) no longer stack; clicking a new option replaces the previous one
+
+### Changed
+
+- **Camera angle migrated from text to chips** — `cameraAngle: string` replaced by `cameraAngles: string[]` with chip selector; Dexie DB upgraded to v2 with migration
+- **All 20 templates enriched** — Existing templates updated with relevant Camera Angle, Color Palette, Medium, Quality, Framing and Mood chips
+- **Preset type unified** — New `Preset` interface; `StyleChip` and `LightingPreset` are now type aliases
+- **SavedPrompt expanded** — Added optional fields: `cameraAngles`, `colorPalette`, `medium`, `quality`, `framing`, `mood`
+
 ## [1.1.0] - 2026-02-09
 
 ### Added
@@ -48,5 +68,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - **Dark mode** — Dark theme by default with light mode toggle via next-themes
 - **Copy to clipboard** — One-click copy with visual feedback
 
+[1.2.0]: https://github.com/Pix3ltools-lab/pix3lprompt/releases/tag/v1.2.0
 [1.1.0]: https://github.com/Pix3ltools-lab/pix3lprompt/releases/tag/v1.1.0
 [1.0.0]: https://github.com/Pix3ltools-lab/pix3lprompt/releases/tag/v1.0.0
