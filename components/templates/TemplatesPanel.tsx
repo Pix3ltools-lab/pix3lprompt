@@ -4,7 +4,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { TemplateCard } from "@/components/templates/TemplateCard";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Star } from "lucide-react";
+import { Star, Image, Film, Music } from "lucide-react";
 import { templates } from "@/data/mock";
 import { useStore } from "@/lib/store";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -52,7 +52,9 @@ function FavoriteCard({ prompt }: { prompt: SavedPrompt }) {
 }
 
 export function TemplatesPanel({ mobile }: TemplatesPanelProps) {
-  const quickStart = templates.filter((t) => t.category === "quick-start");
+  const imageTemplates = templates.filter((t) => t.category === "image");
+  const videoTemplates = templates.filter((t) => t.category === "video");
+  const audioTemplates = templates.filter((t) => t.category === "audio");
 
   const favorites = useLiveQuery(
     () =>
@@ -68,11 +70,17 @@ export function TemplatesPanel({ mobile }: TemplatesPanelProps) {
   const content = (
     <div className="flex flex-col gap-4">
       <section>
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Quick Start
-        </h3>
+        <div className="mb-2 flex items-center gap-1.5">
+          <Image className="h-3.5 w-3.5 text-muted-foreground" />
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Image
+          </h3>
+          <Badge variant="secondary" className="text-[10px]">
+            {imageTemplates.length}
+          </Badge>
+        </div>
         <div className="flex flex-col gap-2">
-          {quickStart.map((template) => (
+          {imageTemplates.map((template) => (
             <TemplateCard key={template.id} template={template} />
           ))}
         </div>
@@ -80,6 +88,41 @@ export function TemplatesPanel({ mobile }: TemplatesPanelProps) {
       <Separator />
       <section>
         <div className="mb-2 flex items-center gap-1.5">
+          <Film className="h-3.5 w-3.5 text-muted-foreground" />
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Video
+          </h3>
+          <Badge variant="secondary" className="text-[10px]">
+            {videoTemplates.length}
+          </Badge>
+        </div>
+        <div className="flex flex-col gap-2">
+          {videoTemplates.map((template) => (
+            <TemplateCard key={template.id} template={template} />
+          ))}
+        </div>
+      </section>
+      <Separator />
+      <section>
+        <div className="mb-2 flex items-center gap-1.5">
+          <Music className="h-3.5 w-3.5 text-muted-foreground" />
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Audio
+          </h3>
+          <Badge variant="secondary" className="text-[10px]">
+            {audioTemplates.length}
+          </Badge>
+        </div>
+        <div className="flex flex-col gap-2">
+          {audioTemplates.map((template) => (
+            <TemplateCard key={template.id} template={template} />
+          ))}
+        </div>
+      </section>
+      <Separator />
+      <section>
+        <div className="mb-2 flex items-center gap-1.5">
+          <Star className="h-3.5 w-3.5 text-muted-foreground" />
           <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Favorites
           </h3>
