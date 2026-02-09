@@ -129,7 +129,7 @@ export const useStore = create<EditorState & EditorActions>()((set) => ({
   toggleLighting: (id) =>
     set((state) => ({ lighting: toggleItem(state.lighting, id) })),
   toggleCameraAngle: (id) =>
-    set((state) => ({ cameraAngles: toggleItem(state.cameraAngles, id) })),
+    set((state) => ({ cameraAngles: state.cameraAngles.includes(id) ? [] : [id] })),
   toggleColorPalette: (id) =>
     set((state) => ({ colorPalette: toggleItem(state.colorPalette, id) })),
   toggleMedium: (id) =>
@@ -137,7 +137,7 @@ export const useStore = create<EditorState & EditorActions>()((set) => ({
   toggleQuality: (id) =>
     set((state) => ({ quality: toggleItem(state.quality, id) })),
   toggleFraming: (id) =>
-    set((state) => ({ framing: toggleItem(state.framing, id) })),
+    set((state) => ({ framing: state.framing.includes(id) ? [] : [id] })),
   toggleMood: (id) =>
     set((state) => ({ mood: toggleItem(state.mood, id) })),
 
