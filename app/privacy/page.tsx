@@ -108,16 +108,45 @@ export default function PrivacyPage() {
           </ul>
         </section>
 
-        {/* No tracking */}
+        {/* Analytics */}
         <section>
           <h2 className="mb-2 text-lg font-semibold text-foreground">
-            No Analytics or Tracking
+            Analytics
           </h2>
-          <p>
-            Pix3lPrompt does not use cookies for tracking, does not load
-            analytics scripts (Google Analytics, Meta Pixel, etc.), and does not
-            collect telemetry of any kind. We do not track page views, clicks,
-            sessions, IP addresses, or device information.
+          <p className="mb-3">
+            Pix3lPrompt uses{" "}
+            <strong className="text-foreground">Vercel Analytics</strong> to
+            collect anonymous, aggregated usage data such as page views and
+            visitor counts. This helps us understand how the app is used and
+            improve it over time.
+          </p>
+          <ul className="list-inside list-disc space-y-1">
+            <li>
+              Vercel Analytics is{" "}
+              <strong className="text-foreground">cookieless</strong> &mdash; it
+              does not set any cookies on your device.
+            </li>
+            <li>
+              No personally identifiable information (PII) is collected. There
+              is no user tracking, fingerprinting, or cross-site profiling.
+            </li>
+            <li>
+              Data is processed by{" "}
+              <a
+                href="https://vercel.com/legal/privacy-policy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+              >
+                Vercel Inc.
+              </a>{" "}
+              and is compliant with GDPR, CCPA, and PECR.
+            </li>
+          </ul>
+          <p className="mt-3">
+            No other analytics services (Google Analytics, Meta Pixel, etc.) are
+            used. We do not track clicks, sessions, IP addresses, or device
+            information.
           </p>
         </section>
 
@@ -144,7 +173,8 @@ export default function PrivacyPage() {
             </li>
           </ul>
           <p className="mt-3">
-            No other third-party scripts, pixels, or beacons are included.
+            No other third-party scripts, pixels, or beacons are included
+            beyond Vercel Analytics (described above).
           </p>
         </section>
 
