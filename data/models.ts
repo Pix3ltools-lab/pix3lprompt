@@ -86,6 +86,25 @@ export const modelConfigs: ModelConfig[] = [
     negFormat: plainNeg,
     placeholder: "Describe your image with comma-separated keywords...",
   },
+  // Image - Gemini
+  {
+    id: "gemini-flash-image",
+    label: "Gemini Flash Image",
+    group: "image",
+    suffix: "",
+    arFormat: plainAr,
+    negFormat: () => "",
+    placeholder: "Describe the scene in natural language — use full sentences, not keywords...",
+  },
+  {
+    id: "gemini-pro-image",
+    label: "Gemini Pro Image",
+    group: "image",
+    suffix: "",
+    arFormat: plainAr,
+    negFormat: () => "",
+    placeholder: "Describe the scene in detail — camera angles, lighting, mood, style...",
+  },
   // Image - Others
   {
     id: "leonardo-phoenix",
