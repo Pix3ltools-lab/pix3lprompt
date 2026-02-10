@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.1] - 2026-02-10
+
+### Added
+
+- **LM Studio support** — New AI provider option for local models via LM Studio's OpenAI-compatible API; configurable server URL and model name, no API key required
+- **Dedicated LM Studio settings UI** — Server URL field (default `http://localhost:1234/v1`), free-text model name input, connection test button, and local-specific privacy notice
+
 ## [1.3.0] - 2026-02-09
 
 ### Added
@@ -79,6 +86,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - **Dark mode** — Dark theme by default with light mode toggle via next-themes
 - **Copy to clipboard** — One-click copy with visual feedback
 
+[1.3.1]: https://github.com/Pix3ltools-lab/pix3lprompt/releases/tag/v1.3.1
 [1.3.0]: https://github.com/Pix3ltools-lab/pix3lprompt/releases/tag/v1.3.0
 [1.2.0]: https://github.com/Pix3ltools-lab/pix3lprompt/releases/tag/v1.2.0
 [1.1.0]: https://github.com/Pix3ltools-lab/pix3lprompt/releases/tag/v1.1.0

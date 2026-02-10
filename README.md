@@ -9,7 +9,7 @@ An intelligent prompt editor for AI image, video and audio generators. Craft, op
 - **Multi-model support** — Model-aware prompt assembly with correct syntax for each generator (Midjourney `--ar`, `--v`, `--no`; Flux/SD natural language; DALL-E; Suno/Udio audio)
 - **Visual prompt builder** — Subject field, 20 style chips, 14 lighting presets, aspect ratio picker, details, negative prompt
 - **Live preview** — Color-coded syntax highlighting by segment type (subject, style, lighting, parameters, negative)
-- **AI-powered optimization** — Optimize and generate variations via OpenRouter, OpenAI, or Anthropic (optional, with local rules fallback)
+- **AI-powered optimization** — Optimize and generate variations via OpenRouter, OpenAI, Anthropic, or LM Studio local models (optional, with local rules fallback)
 - **Prompt history** — Save, rate (1-5 stars), tag, favorite, search and reload past prompts
 - **Templates** — Quick-start templates and auto-populated favorites (rating >= 4 stars)
 - **100% client-side** — All data stored in IndexedDB, nothing leaves your browser unless you opt into an AI provider
@@ -109,7 +109,7 @@ pix3lprompt/
 │   ├── store.ts              # Zustand store
 │   ├── db.ts                 # Dexie database schema
 │   ├── utils.ts              # Utility functions
-│   └── ai/                   # AI providers (local-rules, openrouter)
+│   └── ai/                   # AI providers (local-rules, openrouter, lmstudio)
 └── types/
     └── index.ts              # Shared TypeScript types
 ```
