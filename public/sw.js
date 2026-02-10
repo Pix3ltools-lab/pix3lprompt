@@ -1,4 +1,4 @@
-const CACHE_NAME = "pix3lprompt-v1";
+const CACHE_NAME = "pix3lprompt-v1.3.1";
 
 self.addEventListener("install", () => {
   self.skipWaiting();
