@@ -1,4 +1,4 @@
-const CACHE_NAME = "pix3lprompt-v1.3.1";
+const CACHE_NAME = "pix3lprompt-v1.3.1a";
 
 self.addEventListener("install", () => {
   self.skipWaiting();
@@ -23,6 +23,9 @@ self.addEventListener("fetch", (event) => {
 
   // Skip chrome-extension and other non-http(s) requests
   if (!request.url.startsWith("http")) return;
+
+  // Skip requests to different origins (e.g. local LM Studio, external APIs)
+  if (new URL(request.url).origin !== self.location.origin) return;
 
   // Network first, fallback to cache
   event.respondWith(
