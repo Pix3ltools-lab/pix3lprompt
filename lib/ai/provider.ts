@@ -29,7 +29,7 @@ export interface AiProvider {
   ): Promise<Suggestion[]>;
 }
 
-export type ProviderType = "openrouter" | "openai" | "anthropic" | "none";
+export type ProviderType = "openrouter" | "openai" | "anthropic" | "lmstudio" | "none";
 
 export function createProvider(config: AiProviderConfig): AiProvider {
   // Dynamic imports would be cleaner but for simplicity we use a lazy approach

@@ -33,7 +33,7 @@ export interface UserPreference {
 
 export interface AiProviderConfig {
   id?: number;
-  provider: "openrouter" | "openai" | "anthropic" | "none";
+  provider: "openrouter" | "openai" | "anthropic" | "lmstudio" | "none";
   apiKey: string;
   model: string;
   baseUrl?: string;

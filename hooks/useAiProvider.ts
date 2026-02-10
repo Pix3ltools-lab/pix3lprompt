@@ -6,17 +6,27 @@ import type { AiProviderConfig } from "@/types";
 import type { AiProvider, PromptContext } from "@/lib/ai/provider";
 import { LocalRulesProvider } from "@/lib/ai/local-rules";
 import { OpenRouterProvider } from "@/lib/ai/openrouter";
+import { LmStudioProvider } from "@/lib/ai/lmstudio";
 
 const localProvider = new LocalRulesProvider();
 
 function buildProvider(config: AiProviderConfig | null): AiProvider {
-  if (!config || config.provider === "none" || !config.apiKey) {
+  if (!config || config.provider === "none") {
+    return localProvider;
+  }
+  if (!config.apiKey && config.provider !== "lmstudio") {
     return localProvider;
   }
 
   switch (config.provider) {
     case "openrouter":
       return new OpenRouterProvider(config.apiKey, config.model);
+    case "lmstudio":
+      return new LmStudioProvider(
+        config.model,
+        config.baseUrl ?? "http://localhost:1234/v1",
+        config.apiKey
+      );
     // openai and anthropic can be added later — they follow the same pattern
     default:
       return localProvider;

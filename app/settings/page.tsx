@@ -28,6 +28,7 @@ type ProviderOption = AiProviderConfig["provider"];
 const providerOptions: { value: ProviderOption; label: string; description: string }[] = [
   { value: "none", label: "None", description: "Local rules only — no API key needed" },
   { value: "openrouter", label: "OpenRouter", description: "Recommended — 300+ models, single API key" },
+  { value: "lmstudio", label: "LM Studio", description: "Local model — no API key needed, runs on your machine" },
   { value: "openai", label: "OpenAI", description: "Direct OpenAI API access" },
   { value: "anthropic", label: "Anthropic", description: "Direct Anthropic API access" },
 ];
@@ -40,6 +41,7 @@ const suggestedModels: Record<ProviderOption, { value: string; label: string }[]
     { value: "openai/gpt-4o-mini", label: "GPT-4o Mini (fast)" },
     { value: "mistralai/mistral-large-latest", label: "Mistral Large (EU alternative)" },
   ],
+  lmstudio: [],
   openai: [
     { value: "gpt-4o-mini", label: "GPT-4o Mini" },
     { value: "gpt-4o", label: "GPT-4o" },
@@ -54,6 +56,7 @@ export default function SettingsPage() {
   const [provider, setProvider] = useState<ProviderOption>("none");
   const [apiKey, setApiKey] = useState("");
   const [model, setModel] = useState("");
+  const [baseUrl, setBaseUrl] = useState("http://localhost:1234/v1");
   const [showKey, setShowKey] = useState(false);
   const [testStatus, setTestStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [saving, setSaving] = useState(false);
@@ -69,6 +72,7 @@ export default function SettingsPage() {
           setProvider(config.provider);
           setApiKey(config.apiKey);
           setModel(config.model);
+          if (config.baseUrl) setBaseUrl(config.baseUrl);
         }
       });
   }, []);
@@ -82,14 +86,18 @@ export default function SettingsPage() {
   }, [provider, model]);
 
   async function handleTestConnection() {
-    if (!apiKey || provider === "none") return;
+    if (provider === "none") return;
+    if (provider !== "lmstudio" && !apiKey) return;
     setTestStatus("loading");
     try {
       // Simple test: try to reach the API
       let url: string;
       const headers: Record<string, string> = {};
 
-      if (provider === "openrouter") {
+      if (provider === "lmstudio") {
+        url = `${baseUrl.replace(/\/+$/, "")}/models`;
+        if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`;
+      } else if (provider === "openrouter") {
         url = "https://openrouter.ai/api/v1/models";
         headers["Authorization"] = `Bearer ${apiKey}`;
       } else if (provider === "openai") {
@@ -137,6 +145,7 @@ export default function SettingsPage() {
       provider,
       apiKey: provider === "none" ? "" : apiKey,
       model: provider === "none" ? "" : model,
+      ...(provider === "lmstudio" ? { baseUrl } : {}),
     };
 
     // Upsert: clear existing and add new
@@ -199,8 +208,64 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* API Key */}
-          {provider !== "none" && (
+          {/* LM Studio config */}
+          {provider === "lmstudio" && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="baseUrl">Server URL</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="baseUrl"
+                    type="text"
+                    value={baseUrl}
+                    onChange={(e) => {
+                      setBaseUrl(e.target.value);
+                      setTestStatus("idle");
+                    }}
+                    placeholder="http://localhost:1234/v1"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleTestConnection}
+                    disabled={!baseUrl || testStatus === "loading"}
+                    className="gap-1.5"
+                  >
+                    {testStatus === "loading" && (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    )}
+                    {testStatus === "success" && (
+                      <CheckCircle className="h-3.5 w-3.5 text-green-500" />
+                    )}
+                    {testStatus === "error" && (
+                      <XCircle className="h-3.5 w-3.5 text-red-500" />
+                    )}
+                    Test
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Make sure LM Studio is running with the local server enabled.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="lmModel">Model name</Label>
+                <Input
+                  id="lmModel"
+                  type="text"
+                  value={model}
+                  onChange={(e) => setModel(e.target.value)}
+                  placeholder="e.g. llama-3.2-3b-instruct"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Enter the model identifier loaded in LM Studio. Leave empty to use the default loaded model.
+                </p>
+              </div>
+            </>
+          )}
+
+          {/* Cloud provider config (API Key + Model) */}
+          {provider !== "none" && provider !== "lmstudio" && (
             <>
               <div className="space-y-2">
                 <Label htmlFor="apiKey">API Key</Label>
@@ -272,9 +337,18 @@ export default function SettingsPage() {
 
           {/* Security notice */}
           <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/5 p-3 text-xs text-muted-foreground">
-            Your API key is stored <strong>only</strong> in your browser
-            (IndexedDB). It is never sent to any server except the AI provider
-            you selected.
+            {provider === "lmstudio" ? (
+              <>
+                LM Studio runs <strong>locally</strong> on your machine. No data
+                leaves your computer.
+              </>
+            ) : (
+              <>
+                Your API key is stored <strong>only</strong> in your browser
+                (IndexedDB). It is never sent to any server except the AI provider
+                you selected.
+              </>
+            )}
           </div>
 
           {/* Save button */}
