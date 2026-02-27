@@ -23,6 +23,7 @@ import { useStore } from "@/lib/store";
 import { useHistory } from "@/hooks/useHistory";
 import { useAiProvider } from "@/hooks/useAiProvider";
 import { ModelSelector } from "@/components/editor/ModelSelector";
+import { SendToPix3lBoardModal } from "@/components/editor/SendToPix3lBoardModal";
 import Link from "next/link";
 import { toast } from "sonner";
 
@@ -106,6 +107,7 @@ export function EditorPanel() {
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
   const [variations, setVariations] = useState<string[] | null>(null);
+  const [sendModalOpen, setSendModalOpen] = useState(false);
 
   const modelConfig = useMemo(() => getModelConfig(targetModel), [targetModel]);
 
@@ -479,12 +481,7 @@ export function EditorPanel() {
           size="sm"
           variant="outline"
           className="gap-1.5"
-          onClick={() =>
-            toast.info("Pix3lBoard integration is coming soon!", {
-              description:
-                "Send prompts directly to Pix3lBoard to organize your creative projects. Stay tuned for a future update.",
-            })
-          }
+          onClick={() => setSendModalOpen(true)}
         >
           <Send className="h-3.5 w-3.5" />
           Send to Pix3lBoard
@@ -506,6 +503,16 @@ export function EditorPanel() {
           {aiError}
         </div>
       )}
+
+      {/* Send to Pix3lBoard modal */}
+      <SendToPix3lBoardModal
+        open={sendModalOpen}
+        onClose={() => setSendModalOpen(false)}
+        assembledPrompt={assembledPrompt}
+        subject={subject}
+        details={details}
+        targetModel={targetModel}
+      />
 
       {/* Variations panel */}
       {variations && variations.length > 0 && (

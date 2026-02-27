@@ -1,10 +1,11 @@
 import Dexie, { type Table } from "dexie";
-import type { SavedPrompt, UserPreference, AiProviderConfig } from "@/types";
+import type { SavedPrompt, UserPreference, AiProviderConfig, Pix3lBoardConfig } from "@/types";
 
 class Pix3lPromptDB extends Dexie {
   prompts!: Table<SavedPrompt>;
   preferences!: Table<UserPreference>;
   aiConfig!: Table<AiProviderConfig>;
+  pix3lboardConfig!: Table<Pix3lBoardConfig>;
 
   constructor() {
     super("pix3lprompt");
@@ -36,6 +37,13 @@ class Pix3lPromptDB extends Dexie {
         prompt.framing ??= [];
         prompt.mood ??= [];
       });
+    });
+
+    this.version(3).stores({
+      prompts: "++id, rating, targetModel, createdAt, *tags, *styles",
+      preferences: "++id, key",
+      aiConfig: "++id, provider",
+      pix3lboardConfig: "++id",
     });
   }
 }

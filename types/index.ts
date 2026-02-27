@@ -38,3 +38,12 @@ export interface AiProviderConfig {
   model: string;
   baseUrl?: string;
 }
+
+export interface Pix3lBoardConfig {
+  id?: number;
+  url: string;              // e.g. "https://board.example.com"
+  token: string;            // Bearer JWT
+  tokenObtainedAt: number;  // Date.now() — used to detect 2h expiry
+  userEmail: string;
+  userName: string;
+}

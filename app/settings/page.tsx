@@ -18,9 +18,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Eye, EyeOff, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, CheckCircle, XCircle, Loader2, PlugZap, Unplug } from "lucide-react";
 import { db } from "@/lib/db";
 import type { AiProviderConfig } from "@/types";
+import { usePix3lBoard } from "@/hooks/usePix3lBoard";
 import Link from "next/link";
 
 type ProviderOption = AiProviderConfig["provider"];
@@ -53,6 +54,14 @@ const suggestedModels: Record<ProviderOption, { value: string; label: string }[]
 };
 
 export default function SettingsPage() {
+  // Pix3lBoard connection state
+  const { config: boardConfig, isConnected, isTokenExpired, isLoading: boardLoading, error: boardError, connect, disconnect } = usePix3lBoard();
+  const [boardUrl, setBoardUrl] = useState("");
+  const [boardEmail, setBoardEmail] = useState("");
+  const [boardPassword, setBoardPassword] = useState("");
+  const [showBoardPassword, setShowBoardPassword] = useState(false);
+
+  // AI provider state
   const [provider, setProvider] = useState<ProviderOption>("none");
   const [apiKey, setApiKey] = useState("");
   const [model, setModel] = useState("");
@@ -172,6 +181,112 @@ export default function SettingsPage() {
       </div>
 
       <h1 className="mb-6 text-2xl font-bold">Settings</h1>
+
+      {/* Pix3lBoard Connection */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Pix3lBoard Connection</CardTitle>
+          <CardDescription>
+            Connect to your Pix3lBoard instance to send prompts directly to your boards.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {isConnected ? (
+            /* Connected state */
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 rounded-lg border border-green-500/30 bg-green-500/5 p-3">
+                <span className="h-2 w-2 rounded-full bg-green-500" />
+                <div className="flex-1 text-sm">
+                  <span className="font-medium">Connected</span>
+                  <span className="text-muted-foreground"> as {boardConfig?.userEmail}</span>
+                </div>
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {boardConfig?.url}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+                onClick={disconnect}
+              >
+                <Unplug className="h-3.5 w-3.5" />
+                Disconnect
+              </Button>
+            </div>
+          ) : (
+            /* Connect form */
+            <div className="space-y-4">
+              {boardConfig && isTokenExpired() && (
+                <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/5 p-3 text-xs text-yellow-600 dark:text-yellow-400">
+                  Session expired. Please reconnect.
+                </div>
+              )}
+              <div className="space-y-2">
+                <Label htmlFor="boardUrl">Pix3lBoard URL</Label>
+                <Input
+                  id="boardUrl"
+                  type="url"
+                  value={boardUrl}
+                  onChange={(e) => setBoardUrl(e.target.value)}
+                  placeholder="https://board.example.com"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="boardEmail">Email</Label>
+                <Input
+                  id="boardEmail"
+                  type="email"
+                  value={boardEmail}
+                  onChange={(e) => setBoardEmail(e.target.value)}
+                  placeholder="you@example.com"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="boardPassword">Password</Label>
+                <div className="relative">
+                  <Input
+                    id="boardPassword"
+                    type={showBoardPassword ? "text" : "password"}
+                    value={boardPassword}
+                    onChange={(e) => setBoardPassword(e.target.value)}
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowBoardPassword(!showBoardPassword)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showBoardPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+              {boardError && (
+                <p className="text-xs text-destructive">{boardError}</p>
+              )}
+              <Button
+                size="sm"
+                className="gap-1.5"
+                disabled={boardLoading || !boardUrl || !boardEmail || !boardPassword}
+                onClick={async () => {
+                  const ok = await connect(boardUrl, boardEmail, boardPassword);
+                  if (ok) setBoardPassword("");
+                }}
+              >
+                {boardLoading ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <PlugZap className="h-3.5 w-3.5" />
+                )}
+                {boardLoading ? "Connecting..." : "Connect"}
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                Your password is used only to obtain a session token and is never stored.
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
