@@ -95,7 +95,7 @@ export function usePix3lBoard() {
     });
     if (!res.ok) throw new Error(`Failed to load boards (${res.status})`);
     const data = await res.json();
-    return data.boards ?? [];
+    return data.data ?? [];
   }, [config]);
 
   const getLists = useCallback(
@@ -106,7 +106,7 @@ export function usePix3lBoard() {
       });
       if (!res.ok) throw new Error(`Failed to load lists (${res.status})`);
       const data = await res.json();
-      return data.lists ?? [];
+      return data.data ?? [];
     },
     [config]
   );
@@ -130,7 +130,7 @@ export function usePix3lBoard() {
       });
       if (!res.ok) throw new Error(`Failed to create card (${res.status})`);
       const body = await res.json();
-      return body.card?.id ?? "";
+      return body.data?.id ?? "";
     },
     [config]
   );
