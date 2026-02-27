@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.4.0] - 2026-02-27
+
+### Added
+
+- **Send to Pix3lBoard** — Prompts can now be sent directly to a Pix3lBoard instance from the editor; select board and list in a modal, a new card is created with the assembled prompt, subject, details and target model
+- **Pix3lBoard connection settings** — New section in Settings to connect to any Pix3lBoard instance via URL, email and password; Bearer JWT token stored in IndexedDB, password never persisted
+- **Docker deployment** — Official `Dockerfile` (multi-stage, port 3002); pix3lprompt is now part of the `pix3ltools-deploy` stack alongside pix3lboard and pix3lwiki, with full HTTPS/Traefik support
+
 ## [1.3.1] - 2026-02-10
 
 ### Added
